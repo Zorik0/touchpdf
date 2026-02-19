@@ -63,6 +63,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: '/icon',
+    apple: '/apple-icon',
+  },
   verification: {
     // Add your Google Search Console verification code here
     // google: 'your-verification-code',
@@ -157,11 +161,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Favicons */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
