@@ -1,0 +1,113 @@
+.wrapper {
+    padding-top: 20px;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.fileInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: inherit;
+    color: inherit;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.pageCard {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.pageCard:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.pageThumb {
+    flex: 1;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    aspect-ratio: 210/297;
+    position: relative;
+    padding: 0;
+}
+
+.pageThumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    box-shadow: none;
+}
+
+.pageNumber {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    font-family: inherit;
+}
+
+.cardFooter {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border-top: 1px solid var(--glass-border);
+}
+
+.actionBtn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.actionBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: transparent;
+}
+
+.deleteBtn:hover {
+    background: rgba(244, 63, 94, 0.1);
+    color: var(--danger);
+}

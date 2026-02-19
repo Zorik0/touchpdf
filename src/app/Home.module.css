@@ -1,0 +1,311 @@
+/* ── Hero ── */
+.hero {
+    padding: 20px 0 60px;
+    text-align: center;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.heroTitle {
+    font-size: 3.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+    line-height: 1.05;
+}
+
+.heroSubtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 440px;
+    margin: 0 auto 56px;
+    line-height: 1.65;
+    font-weight: 400;
+}
+
+/* ── Trusted Bar ── */
+.trustBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+}
+
+.trustItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.trustIcon {
+    color: var(--accent-3);
+    opacity: 0.7;
+}
+
+/* ── Categories ── */
+.gridContainer {
+    display: grid;
+    gap: 48px;
+}
+
+.categorySection {
+    text-align: left;
+}
+
+.categoryLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 20px;
+    padding-left: 4px;
+}
+
+/* ── Tool Grid ── */
+.toolGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+/* ── Tool Card ── */
+.toolCard {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+}
+
+.toolCard:hover {
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Icon Circle ── */
+.toolIconWrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Default subtle bg — overridden per type */
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+/* Color variants by data-type */
+.toolCard[data-type="pdf"] .toolIconWrapper {
+    color: #ef6461;
+    background: rgba(239, 100, 97, 0.08);
+}
+
+.toolCard[data-type="image"] .toolIconWrapper {
+    color: #f4a261;
+    background: rgba(244, 162, 97, 0.08);
+}
+
+.toolCard[data-type="word"] .toolIconWrapper {
+    color: #5b9bd5;
+    background: rgba(91, 155, 213, 0.08);
+}
+
+.toolCard[data-type="excel"] .toolIconWrapper {
+    color: #2ec4b6;
+    background: rgba(46, 196, 182, 0.08);
+}
+
+.toolCard[data-type="ppt"] .toolIconWrapper {
+    color: #e07a5f;
+    background: rgba(224, 122, 95, 0.08);
+}
+
+.toolCard[data-type="html"] .toolIconWrapper {
+    color: #c084fc;
+    background: rgba(192, 132, 252, 0.08);
+}
+
+/* ── Info ── */
+.toolInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.toolTitle {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toolDesc {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ── Badge ── */
+.newBadge {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    background: var(--accent-1);
+    color: white;
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    box-shadow: 0 2px 6px rgba(232, 115, 74, 0.3);
+}
+
+/* ── Search Bar ── */
+.searchWrapper {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto 32px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 14px 44px 14px 48px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.searchInput::placeholder {
+    color: var(--text-muted);
+}
+
+.searchInput:focus {
+    border-color: var(--accent-1);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 2px rgba(232, 115, 74, 0.08);
+}
+
+.searchClear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.searchClear:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.emptySearch {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ── Ad Slots ── */
+.adBanner {
+    margin: 32px 0;
+    min-height: 90px;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px dashed rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.adInline {
+    margin: 24px 0;
+    min-height: 100px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .heroTitle {
+        font-size: 2.6rem;
+    }
+
+    .toolGrid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .toolCard {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .toolIconWrapper {
+        width: 36px;
+        height: 36px;
+    }
+
+    .toolTitle {
+        font-size: 0.82rem;
+    }
+
+    .toolDesc {
+        display: none;
+    }
+
+    .trustBar {
+        gap: 16px;
+    }
+
+    .searchWrapper {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .toolGrid {
+        grid-template-columns: 1fr;
+    }
+}
