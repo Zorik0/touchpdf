@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
-import Script from 'next/script';
+import { useToast } from '../components/ui/Toast';
 import { RotateCw, Upload, FileText, Download, Loader2, ListRestart } from 'lucide-react';
 
 export default function RotatePdfPage() {
@@ -13,6 +13,7 @@ export default function RotatePdfPage() {
   const [customPages, setCustomPages] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
@@ -50,7 +51,10 @@ export default function RotatePdfPage() {
       a.download = `${file.name.replace('.pdf', '')}_rotated.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) { console.error(err); alert('Error rotating PDF'); }
+    } catch (err) { 
+      console.error(err); 
+      addToast('Error rotating PDF', 'error'); 
+    }
     finally { setIsProcessing(false); }
   };
 

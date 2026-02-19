@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import { useToast } from '../components/ui/Toast';
 import { Lock, Upload, FileText, Download, Loader2, ListRestart, Eye, EyeOff } from 'lucide-react';
 
 export default function ProtectPdfPage() {
@@ -10,6 +11,7 @@ export default function ProtectPdfPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
@@ -45,7 +47,10 @@ export default function ProtectPdfPage() {
       a.download = `${file.name.replace('.pdf', '')}_protected.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) { console.error(err); alert('Error protecting PDF'); }
+    } catch (err) { 
+      console.error(err); 
+      addToast('Error protecting PDF', 'error'); 
+    }
     finally { setIsProcessing(false); }
   };
 

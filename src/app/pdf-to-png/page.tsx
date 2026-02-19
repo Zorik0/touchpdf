@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
-import Script from 'next/script';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import JSZip from 'jszip';
 import { 
   Image as ImageIcon, 
@@ -13,6 +12,8 @@ import {
   Package,
   Loader2
 } from 'lucide-react';
+import { initPdfWorker } from '../lib/pdf-worker';
+import { useToast } from '../components/ui/Toast';
 import styles from './PdfToPng.module.css';
 
 interface PageImage {
@@ -29,7 +30,8 @@ export default function PdfToPngPage() {
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);
-  const [pdfLibLoaded, setPdfLibLoaded] = useState(false);
+
+  const { addToast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,20 +44,22 @@ export default function PdfToPngPage() {
     setTimeout(() => processPdf(f), 100);
   }, []);
 
-  const processPdf = async (f: File) => {
-    const pdfjsLib = (window as any).pdfjsLib;
-    if (!pdfjsLib) {
-      alert('PDF Engine loading... please try again in a moment.');
-      return;
-    }
+  // Cleanup URLs on unmount
+  useEffect(() => {
+    return () => {
+      images.forEach(img => URL.revokeObjectURL(img.dataUrl));
+    };
+  }, [images]);
 
+  const processPdf = async (f: File) => {
     setProcessing(true);
     setProgress(0);
     setImages([]);
 
     try {
       const arrayBuffer = await f.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+      const pdfjs = await initPdfWorker();
+      const loadingTask = pdfjs.getDocument(arrayBuffer);
       const pdf = await loadingTask.promise;
       const totalPages = pdf.numPages;
 
@@ -72,7 +76,7 @@ export default function PdfToPngPage() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-           await page.render({ canvasContext: ctx, viewport }).promise;
+           await page.render({ canvasContext: ctx, viewport } as any).promise;
            
            // Convert to blob
            const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
@@ -94,7 +98,7 @@ export default function PdfToPngPage() {
       }
     } catch (err) {
       console.error('Error converting PDF:', err);
-      alert('Failed to convert PDF. It might be corrupted or password protected.');
+      addToast('Failed to convert PDF. It might be corrupted or password protected.', 'error');
     } finally {
       setProcessing(false);
     }
@@ -145,16 +149,6 @@ export default function PdfToPngPage() {
 
   return (
     <div className="page-container">
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-        onLoad={() => {
-          if ((window as any).pdfjsLib) {
-             (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-             setPdfLibLoaded(true);
-          }
-        }}
-        strategy="afterInteractive"
-      />
 
       <div className={`${styles.wrapper} animate-in`}>
         <div className="section-header">

@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import Script from 'next/script';
 import { 
   Combine, 
   Upload, 
@@ -13,6 +12,8 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
+import { initPdfWorker } from '../lib/pdf-worker';
+import { useToast } from '../components/ui/Toast';
 import styles from '../organize/Organize.module.css'; // Reuse existing styles
 
 interface PdfFile {
@@ -25,24 +26,23 @@ export default function MergePdfPage() {
   const [items, setItems] = useState<PdfFile[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files) return;
 
-    const pdfjsLib = (window as any).pdfjsLib;
-    
     const newItems: Promise<PdfFile>[] = Array.from(files)
       .filter(f => f.type === 'application/pdf')
       .map(async (file) => {
         let pageCount = 0;
-        if (pdfjsLib) {
-          try {
-             const ab = await file.arrayBuffer();
-             const pdf = await pdfjsLib.getDocument(ab).promise;
-             pageCount = pdf.numPages;
-          } catch (e) { console.error(e); }
-        }
+        try {
+           const ab = await file.arrayBuffer();
+           const pdfjs = await initPdfWorker();
+           const pdf = await pdfjs.getDocument(ab).promise;
+           pageCount = pdf.numPages;
+        } catch (e) { console.error('Error reading PDF metadata:', e); }
+
         return {
           id: Math.random().toString(36).substring(7),
           file,
@@ -91,7 +91,7 @@ export default function MergePdfPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error('Merge error:', err);
-      alert('Failed to merge PDFs. Some files might be encrypted or corrupted.');
+      addToast('Failed to merge PDFs. Some files might be encrypted or corrupted.', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -107,10 +107,6 @@ export default function MergePdfPage() {
 
   return (
     <div className="page-container">
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-        strategy="afterInteractive"
-      />
 
       <div className={`wrapper animate-in`} style={{paddingTop: 40}}>
         <div className="section-header">

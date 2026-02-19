@@ -2,8 +2,9 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import Script from 'next/script';
 import JSZip from 'jszip';
+import { initPdfWorker } from '../lib/pdf-worker';
+import { useToast } from '../components/ui/Toast';
 import { 
   Scissors, 
   Upload, 
@@ -22,17 +23,21 @@ export default function SplitPdfPage() {
   const [splitMode, setSplitMode] = useState<'all' | 'range'>('all');
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
     if (f.type !== 'application/pdf') return;
     setFile(f);
     
-    const pdfjsLib = (window as any).pdfjsLib;
-    if (pdfjsLib) {
+    try {
       const ab = await f.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument(ab).promise;
+      const pdfjs = await initPdfWorker();
+      const pdf = await pdfjs.getDocument(ab).promise;
       setPageCount(pdf.numPages);
+    } catch (err) {
+      console.error(err);
+      addToast('Error reading PDF', 'error');
     }
   }, []);
 
@@ -93,7 +98,7 @@ export default function SplitPdfPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
-      alert('Error splitting PDF');
+      addToast('Error splitting PDF', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -115,8 +120,6 @@ export default function SplitPdfPage() {
 
   return (
     <div className="page-container">
-      <Script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" strategy="afterInteractive" />
-
       <div className={`wrapper animate-in`} style={{paddingTop: 40}}>
         <div className="section-header">
            <div className="section-badge"><Scissors size={14} /> Split Tool</div>

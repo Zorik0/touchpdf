@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import Script from 'next/script';
+import { useToast } from '../components/ui/Toast';
 import { Minimize2, Upload, FileText, Download, Loader2, ListRestart, Info } from 'lucide-react';
 
 export default function CompressPdfPage() {
@@ -13,6 +13,7 @@ export default function CompressPdfPage() {
   const [done, setDone] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [compressedUrl, setCompressedUrl] = useState('');
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
@@ -53,7 +54,7 @@ export default function CompressPdfPage() {
       setDone(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to compress PDF.');
+      addToast('Failed to compress PDF.', 'error');
     } finally {
       setIsProcessing(false);
     }

@@ -15,6 +15,7 @@ import {
   MoveDown
 } from 'lucide-react';
 import styles from './PngToPdf.module.css';
+import { useToast } from '../components/ui/Toast';
 
 interface ImageItem {
   id: string;
@@ -29,6 +30,7 @@ export default function PngToPdfPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast } = useToast();
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
@@ -129,7 +131,7 @@ export default function PngToPdfPage() {
       pdf.save('images-combined.pdf');
     } catch (err) {
       console.error(err);
-      alert('Error generating PDF');
+      addToast('Error generating PDF', 'error');
     } finally {
       setIsGenerating(false);
     }

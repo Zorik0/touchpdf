@@ -1,193 +1,81 @@
 /* ── Hero ── */
 .hero {
-    padding: 20px 0 60px;
+    padding: 60px 20px 80px;
     text-align: center;
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .heroTitle {
-    font-size: 3.8rem;
+    font-size: 4.5rem;
     font-weight: 800;
     letter-spacing: -0.04em;
-    margin-bottom: 16px;
-    line-height: 1.05;
+    margin-bottom: 24px;
+    line-height: 1.1;
+    color: var(--text-primary);
 }
 
 .heroSubtitle {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     color: var(--text-secondary);
-    max-width: 440px;
-    margin: 0 auto 56px;
-    line-height: 1.65;
+    max-width: 680px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
     font-weight: 400;
 }
 
-/* ── Trusted Bar ── */
+/* ── Trust Bar ── */
 .trustBar {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 28px;
+    gap: 16px;
     margin-bottom: 60px;
     flex-wrap: wrap;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .trustItem {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 0.82rem;
+}
+
+.trustDivider {
     color: var(--text-muted);
-    font-weight: 500;
+    opacity: 0.3;
 }
 
 .trustIcon {
-    color: var(--accent-3);
-    opacity: 0.7;
+    color: var(--accent-1);
+    opacity: 0.9;
 }
 
-/* ── Categories ── */
-.gridContainer {
-    display: grid;
-    gap: 48px;
-}
-
-.categorySection {
-    text-align: left;
-}
-
-.categoryLabel {
-    font-size: 0.72rem;
-    font-weight: 700;
+/* ── Visual Proof Placeholder ── */
+.visualProof {
+    margin: 40px auto 80px;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
     color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 20px;
-    padding-left: 4px;
-}
-
-/* ── Tool Grid ── */
-.toolGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-}
-
-/* ── Tool Card ── */
-.toolCard {
-    display: flex;
-    align-items: center;
-    padding: 16px 18px;
-    gap: 14px;
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    position: relative;
-    cursor: pointer;
-}
-
-.toolCard:hover {
-    background: rgba(255, 255, 255, 0.055);
-    border-color: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.4);
-}
-
-/* ── Icon Circle ── */
-.toolIconWrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    /* Default subtle bg — overridden per type */
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-secondary);
-}
-
-/* Color variants by data-type */
-.toolCard[data-type="pdf"] .toolIconWrapper {
-    color: #ef6461;
-    background: rgba(239, 100, 97, 0.08);
-}
-
-.toolCard[data-type="image"] .toolIconWrapper {
-    color: #f4a261;
-    background: rgba(244, 162, 97, 0.08);
-}
-
-.toolCard[data-type="word"] .toolIconWrapper {
-    color: #5b9bd5;
-    background: rgba(91, 155, 213, 0.08);
-}
-
-.toolCard[data-type="excel"] .toolIconWrapper {
-    color: #2ec4b6;
-    background: rgba(46, 196, 182, 0.08);
-}
-
-.toolCard[data-type="ppt"] .toolIconWrapper {
-    color: #e07a5f;
-    background: rgba(224, 122, 95, 0.08);
-}
-
-.toolCard[data-type="html"] .toolIconWrapper {
-    color: #c084fc;
-    background: rgba(192, 132, 252, 0.08);
-}
-
-/* ── Info ── */
-.toolInfo {
-    flex: 1;
-    min-width: 0;
-}
-
-.toolTitle {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.toolDesc {
-    font-size: 0.76rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-
-/* ── Badge ── */
-.newBadge {
-    position: absolute;
-    top: -6px;
-    right: -4px;
-    background: var(--accent-1);
-    color: white;
-    font-size: 0.58rem;
-    font-weight: 800;
-    padding: 2px 5px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    box-shadow: 0 2px 6px rgba(232, 115, 74, 0.3);
+    font-style: italic;
 }
 
 /* ── Search Bar ── */
 .searchWrapper {
     position: relative;
-    max-width: 480px;
-    margin: 0 auto 32px;
+    max-width: 560px;
+    margin: 0 auto 56px;
 }
 
 .searchIcon {
     position: absolute;
-    left: 16px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
@@ -196,61 +84,249 @@
 
 .searchInput {
     width: 100%;
-    padding: 14px 44px 14px 48px;
-    background: rgba(255, 255, 255, 0.03);
+    padding: 16px 56px 16px 52px;
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 14px;
     color: var(--text-primary);
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 1rem;
     outline: none;
     transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
 }
 
 .searchInput::placeholder {
     color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .searchInput:focus {
     border-color: var(--accent-1);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 0 2px rgba(232, 115, 74, 0.08);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(232, 115, 74, 0.1);
 }
 
 .searchClear {
     position: absolute;
-    right: 12px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 8px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
+    transition: all 0.2s;
 }
 
 .searchClear:hover {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .emptySearch {
     text-align: center;
-    padding: 40px 20px;
+    padding: 60px 20px;
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 1.1rem;
 }
+
+/* ── Feature Grid Section ── */
+.featureGridContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.gridHeader {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.sectionTitle {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.sectionSubtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.gridContent {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+.categoryGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.categoryHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.categoryTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.toolGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* ── Tool Card ── */
+.toolCard {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+    height: 100%;
+}
+
+.toolCard:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.3);
+}
+
+.toolHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.toolIconWrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Default subtle bg — overridden per type */
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.toolCard:hover .toolIconWrapper {
+    transform: scale(1.05);
+}
+
+/* Color variants by data-type */
+.toolCard[data-type="pdf"] .toolIconWrapper {
+    color: #ef6461;
+    background: rgba(239, 100, 97, 0.1);
+}
+
+.toolCard[data-type="image"] .toolIconWrapper {
+    color: #f4a261;
+    background: rgba(244, 162, 97, 0.1);
+}
+
+.toolCard[data-type="word"] .toolIconWrapper {
+    color: #5b9bd5;
+    background: rgba(91, 155, 213, 0.1);
+}
+
+.toolCard[data-type="excel"] .toolIconWrapper {
+    color: #2ec4b6;
+    background: rgba(46, 196, 182, 0.1);
+}
+
+.toolCard[data-type="ppt"] .toolIconWrapper {
+    color: #e07a5f;
+    background: rgba(224, 122, 95, 0.1);
+}
+
+.toolCard[data-type="html"] .toolIconWrapper {
+    color: #c084fc;
+    background: rgba(192, 132, 252, 0.1);
+}
+
+.toolInfo {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.toolTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.toolDesc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.toolAction {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-1);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.toolCard:hover .toolAction {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.newBadge {
+    background: var(--accent-1);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(232, 115, 74, 0.3);
+}
+
 
 /* ── Ad Slots ── */
 .adBanner {
-    margin: 32px 0;
-    min-height: 90px;
+    margin: 40px auto;
+    width: 100%;
+    max-width: 960px;
+    min-height: 100px;
     background: rgba(255, 255, 255, 0.015);
     border: 1px dashed rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -258,54 +334,79 @@
 }
 
 .adInline {
-    margin: 24px 0;
-    min-height: 100px;
+    margin: 32px 0;
+    min-height: 120px;
     background: rgba(255, 255, 255, 0.01);
     border: 1px dashed rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 10px;
 }
 
 /* ── Responsive ── */
+@media (max-width: 1024px) {
+    .toolGrid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .heroTitle {
-        font-size: 2.6rem;
+        font-size: 3rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1.1rem;
     }
 
     .toolGrid {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        grid-template-columns: 1fr;
     }
 
     .toolCard {
-        padding: 14px;
-        gap: 10px;
-    }
-
-    .toolIconWrapper {
-        width: 36px;
-        height: 36px;
-    }
-
-    .toolTitle {
-        font-size: 0.82rem;
-    }
-
-    .toolDesc {
-        display: none;
-    }
-
-    .trustBar {
+        flex-direction: row;
+        align-items: center;
+        padding: 16px;
         gap: 16px;
     }
 
-    .searchWrapper {
-        max-width: 100%;
+    .toolInfo {
+        margin-bottom: 0;
+    }
+
+    .toolAction {
+        display: none;
+    }
+
+    .toolIconWrapper {
+        width: 40px;
+        height: 40px;
+    }
+
+    .trustBar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .trustDivider {
+        display: none;
+    }
+
+    .categoryHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 }
 
 @media (max-width: 480px) {
-    .toolGrid {
-        grid-template-columns: 1fr;
+    .header {
+        padding: 40px 0 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .heroTitle {
+        font-size: 2.5rem;
     }
 }

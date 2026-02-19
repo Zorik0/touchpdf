@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import Script from 'next/script';
 import { 
   FileText, 
   Upload, 
@@ -11,6 +10,8 @@ import {
   Type, 
   Loader2 
 } from 'lucide-react';
+import { initPdfWorker } from '../lib/pdf-worker';
+import { useToast } from '../components/ui/Toast';
 import styles from './ExtractText.module.css';
 
 export default function ExtractTextPage() {
@@ -20,6 +21,7 @@ export default function ExtractTextPage() {
   const [progress, setProgress] = useState(0);
   const [copied, setCopied] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
@@ -32,18 +34,13 @@ export default function ExtractTextPage() {
   }, []);
 
   const extractText = async (f: File) => {
-    const pdfjsLib = (window as any).pdfjsLib;
-    if (!pdfjsLib) {
-      alert('PDF Engine loading... please try again.');
-      return;
-    }
-
     setProcessing(true);
     setProgress(0);
 
     try {
       const arrayBuffer = await f.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+      const pdfjs = await initPdfWorker();
+      const loadingTask = pdfjs.getDocument(arrayBuffer);
       const pdf = await loadingTask.promise;
       const totalPages = pdf.numPages;
       
@@ -65,7 +62,7 @@ export default function ExtractTextPage() {
       setText(fullText);
     } catch (err) {
       console.error('Error extracting text:', err);
-      alert('Failed to extract text. The PDF might be scanned or protected.');
+      addToast(`Failed to extract text: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
     } finally {
       setProcessing(false);
     }
@@ -93,16 +90,6 @@ export default function ExtractTextPage() {
 
   return (
     <div className="page-container">
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-        onLoad={() => {
-          if ((window as any).pdfjsLib) {
-             (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          }
-        }}
-        strategy="afterInteractive"
-      />
-
       <div className={`${styles.wrapper} animate-in`}>
         <div className="section-header">
           <div className="section-badge">

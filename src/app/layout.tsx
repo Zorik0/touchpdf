@@ -2,8 +2,17 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import MobileBottomNav from "./components/MobileBottomNav";
+import { ToastProvider } from "./components/ui/Toast";
 
 const DOMAIN = 'https://touchpdf.space';
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#000000",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(DOMAIN),
@@ -12,6 +21,11 @@ export const metadata: Metadata = {
     template: '%s | TouchPDF',
   },
   description: 'Free, secure, client-side PDF tools. Merge, split, compress, convert PDFs to JPG, extract text, and more — all in your browser. No file uploads, 100% private.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TouchPDF',
+  },
   keywords: [
     'pdf tools online free',
     'merge pdf',
@@ -179,22 +193,25 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <main className="main-content">
-          {children}
-        </main>
-        
-        <footer className="site-footer">
-          <p>
-            made with <span style={{color: 'var(--danger)'}}>♥</span> for my wife, 
-            but u mortals can use it aswell
-          </p>
-          <p style={{ marginTop: 8, fontSize: '0.75rem' }}>
-            <a href="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none', marginRight: 16 }}>Privacy Policy</a>
-            <a href="/terms" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Terms of Use</a>
-          </p>
-        </footer>
+        <ToastProvider>
+          <main className="main-content">
+            {children}
+          </main>
+          
+          <footer className="site-footer">
+            <p>
+              made with <span style={{color: 'var(--danger)'}}>♥</span> for my wife, 
+              but u mortals can use it aswell
+            </p>
+            <p style={{ marginTop: 8, fontSize: '0.75rem' }}>
+              <a href="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none', marginRight: 16 }}>Privacy Policy</a>
+              <a href="/terms" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Terms of Use</a>
+            </p>
+          </footer>
 
-        <Navbar />
+          <Navbar />
+          <MobileBottomNav />
+        </ToastProvider>
       </body>
     </html>
   );

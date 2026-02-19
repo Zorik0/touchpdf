@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
+import { useToast } from '../components/ui/Toast';
 import { Droplets, Upload, FileText, Download, Loader2, ListRestart } from 'lucide-react';
 
 export default function WatermarkPdfPage() {
@@ -11,6 +12,7 @@ export default function WatermarkPdfPage() {
   const [fontSize, setFontSize] = useState(60);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (f: File) => {
@@ -39,7 +41,7 @@ export default function WatermarkPdfPage() {
           font,
           color: rgb(0.5, 0.5, 0.5),
           opacity: opacity,
-          rotate: { type: 0 as any, angle: -45 },
+          rotate: degrees(-45),
         });
       }
 
@@ -51,7 +53,10 @@ export default function WatermarkPdfPage() {
       a.download = `${file.name.replace('.pdf', '')}_watermarked.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) { console.error(err); alert('Error adding watermark'); }
+    } catch (err) { 
+      console.error(err); 
+      addToast('Error adding watermark', 'error'); 
+    }
     finally { setIsProcessing(false); }
   };
 

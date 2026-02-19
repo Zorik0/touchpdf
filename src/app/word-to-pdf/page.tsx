@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import mammoth from 'mammoth';
 import { FileText, Upload, Download, Loader2, ListRestart } from 'lucide-react';
+import { useToast } from '../components/ui/Toast';
 
 export default function WordToPdfPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -11,10 +12,11 @@ export default function WordToPdfPage() {
   const [isConverting, setIsConverting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast } = useToast();
 
   const handleFile = useCallback(async (f: File) => {
     if (!f.name.match(/\.(docx)$/i)) {
-      alert('Please upload a .docx file');
+      addToast('Please upload a .docx file', 'error');
       return;
     }
     setFile(f);
@@ -26,7 +28,7 @@ export default function WordToPdfPage() {
       setHtmlContent(result.value);
     } catch (err) {
       console.error(err);
-      alert('Failed to parse Word document.');
+      addToast('Failed to parse Word document.', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -69,7 +71,7 @@ export default function WordToPdfPage() {
       pdf.save(`${file?.name.replace(/\.docx$/i, '')}.pdf`);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate PDF.');
+      addToast('Failed to generate PDF.', 'error');
     } finally {
       setIsConverting(false);
     }

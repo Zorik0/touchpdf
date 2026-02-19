@@ -1,0 +1,270 @@
+.header {
+    text-align: center;
+    padding: 60px 0 40px;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.workspace {
+    min-height: 500px;
+    margin-bottom: 60px;
+}
+
+/* ── Upload Zone ── */
+.uploadZone {
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s ease;
+}
+
+.uploadLabel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 40px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.uploadIcon {
+    margin-bottom: 20px;
+    color: var(--accent-1);
+    opacity: 0.8;
+}
+
+.uploadText {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.uploadSubtext {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.uploadZone:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--accent-1);
+}
+
+/* ── Editor ── */
+.editorContainer {
+    background: #1a1a1f;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #25252b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.toolGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.toolBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.toolBtn.active,
+.toolBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.9rem;
+    font-family: monospace;
+}
+
+.pagination button {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+.actionBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--danger);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.downloadBtn {
+    background: var(--accent-1);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.downloadBtn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* ── Document Viewer ── */
+.documentWrapper {
+    max-height: 80vh;
+    overflow: auto;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    background: #121216;
+    position: relative;
+}
+
+.pdfDocument {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.pdfPage {
+    position: relative;
+}
+
+.redactionOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Make sure clicks pass through to selection layer implemented later */
+}
+
+/* ── Info ── */
+.infoSection {
+    margin-top: 60px;
+    display: grid;
+    gap: 20px;
+}
+
+.infoItem {
+    display: flex;
+    gap: 16px;
+    background: rgba(232, 115, 74, 0.05);
+    border: 1px solid rgba(232, 115, 74, 0.1);
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.infoIcon {
+    color: var(--accent-1);
+    flex-shrink: 0;
+}
+
+.infoItem h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.infoItem p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+    .toolbar {
+        position: fixed;
+        bottom: 64px;
+        /* Above mobile nav */
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: #1a1a1f;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 16px;
+        justify-content: space-between;
+    }
+
+    .editorContainer {
+        border-radius: 0;
+        margin-bottom: 80px;
+        /* Space for toolbar */
+    }
+
+    .uploadZone {
+        height: 300px;
+        margin: 20px;
+    }
+
+    .documentWrapper {
+        padding: 20px 10px;
+        max-height: calc(100vh - 200px);
+    }
+
+    .toolBtn span {
+        display: none;
+        /* Hide text on mobile */
+    }
+
+    .pagination span {
+        font-size: 0.8rem;
+    }
+}

@@ -18,6 +18,7 @@ import {
   Trash2
 } from 'lucide-react';
 import styles from './MdToPdf.module.css';
+import { useToast } from '../components/ui/Toast';
 
 const DEFAULT_CSS = `/* Custom PDF Styles */
 body {
@@ -104,6 +105,7 @@ export default function MdToPdfPage() {
   const [showCss, setShowCss] = useState(false);
   const [generating, setGenerating] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+  const { addToast } = useToast();
 
   const htmlContent = useMemo(() => {
     if (!markdown.trim()) return '';
@@ -173,7 +175,7 @@ export default function MdToPdfPage() {
       pdf.save('markdown-document.pdf');
     } catch (err) {
       console.error('PDF generation error:', err);
-      alert('Failed to generate PDF. Please try again.');
+      addToast('Failed to generate PDF. Please try again.', 'error');
     } finally {
       setGenerating(false);
     }

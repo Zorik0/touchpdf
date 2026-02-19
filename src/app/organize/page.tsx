@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
-import Script from 'next/script';
 import { 
   Layers, 
   Upload, 
@@ -15,6 +14,8 @@ import {
   ArrowRight,
   X
 } from 'lucide-react';
+import { initPdfWorker } from '../lib/pdf-worker';
+import { useToast } from '../components/ui/Toast';
 import styles from './Organize.module.css';
 
 interface PageItem {
@@ -29,7 +30,7 @@ export default function OrganizePage() {
   const [pages, setPages] = useState<PageItem[]>([]);
   const [processing, setProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [pdfLibLoaded, setPdfLibLoaded] = useState(false);
+  const { addToast } = useToast();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,19 +43,21 @@ export default function OrganizePage() {
     setTimeout(() => loadPdf(f), 100);
   }, []);
 
-  const loadPdf = async (f: File) => {
-    const pdfjsLib = (window as any).pdfjsLib;
-    if (!pdfjsLib) {
-      alert('PDF Engine loading... please try again.');
-        return;
-    }
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      pages.forEach(p => URL.revokeObjectURL(p.thumbnailUrl));
+    };
+  }, [pages]);
 
+  const loadPdf = async (f: File) => {
     setProcessing(true);
     try {
       const arrayBuffer = await f.arrayBuffer();
       setOriginalPdfBytes(arrayBuffer); // Store for later saving
 
-      const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+      const pdfjs = await initPdfWorker();
+      const loadingTask = pdfjs.getDocument(arrayBuffer);
       const pdf = await loadingTask.promise;
       const totalPages = pdf.numPages;
 
@@ -71,7 +74,7 @@ export default function OrganizePage() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-           await page.render({ canvasContext: ctx, viewport }).promise;
+           await page.render({ canvasContext: ctx, viewport } as any).promise;
            const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.8));
            if (blob) {
              newPages.push({
@@ -88,7 +91,7 @@ export default function OrganizePage() {
 
     } catch (err) {
       console.error('Error loading PDF:', err);
-      alert('Failed to load PDF.');
+      addToast('Failed to load PDF.', 'error');
     } finally {
       setProcessing(false);
     }
@@ -142,7 +145,7 @@ export default function OrganizePage() {
       
     } catch (err) {
       console.error('Error saving PDF:', err);
-      alert('Failed to save organized PDF.');
+      addToast('Failed to save organized PDF.', 'error');
     } finally {
       setProcessing(false);
     }
@@ -164,16 +167,6 @@ export default function OrganizePage() {
 
   return (
     <div className="page-container">
-       <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-        onLoad={() => {
-          if ((window as any).pdfjsLib) {
-             (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-             setPdfLibLoaded(true);
-          }
-        }}
-        strategy="afterInteractive"
-      />
 
       <div className={`${styles.wrapper} animate-in`}>
         <div className="section-header">

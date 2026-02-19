@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { PDFDocument, PDFName, PDFArray, PDFRawStream, PDFRef } from 'pdf-lib';
-import Script from 'next/script';
 import JSZip from 'jszip';
 import { 
   ArrowRightLeft, 
@@ -18,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import { initPdfWorker } from '../lib/pdf-worker';
 import styles from './Invert.module.css';
 
 type FileStatus = 'pending' | 'processing' | 'done' | 'error';
@@ -35,7 +35,7 @@ export default function InvertPage() {
   const [items, setItems] = useState<FileItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [pdfLibLoaded, setPdfLibLoaded] = useState(false);
+
   
   // For previews, we track the currently selected item to show
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -49,11 +49,9 @@ export default function InvertPage() {
 
   // Render a page from a PDF (blob URL) onto a canvas
   const renderPage = useCallback(async (url: string, canvas: HTMLCanvasElement, pageNum: number) => {
-    const pdfjsLib = (window as any).pdfjsLib;
-    if (!pdfjsLib) return;
-
     try {
-      const loadingTask = pdfjsLib.getDocument(url);
+      const pdfjs = await initPdfWorker();
+      const loadingTask = pdfjs.getDocument(url);
       const pdf = await loadingTask.promise;
       
       // Handle out of bounds
@@ -79,7 +77,7 @@ export default function InvertPage() {
           canvasContext: ctx,
           viewport: viewport,
         };
-        await page.render(renderContext).promise;
+        await page.render(renderContext as any).promise;
       }
     } catch (err) {
       console.error('Error rendering page:', err);
@@ -88,7 +86,7 @@ export default function InvertPage() {
 
   // Effect to render previews when selected item changes
   useEffect(() => {
-    if (!pdfLibLoaded || !selectedItem) return;
+    if (!selectedItem) return;
 
     // Create URL for original file if not exists (we don't store it to save memory, create on fly?)
     // Actually better to create it once. Let's assume we create it when needed.
@@ -106,14 +104,12 @@ export default function InvertPage() {
     return () => {
       URL.revokeObjectURL(originalUrl);
     };
-  }, [selectedItem, previewPage, pdfLibLoaded, renderPage, selectedItem?.invertedUrl]);
+  }, [selectedItem, previewPage, renderPage, selectedItem?.invertedUrl]);
 
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
     const newItems: FileItem[] = [];
     
-    const pdfjsLib = (window as any).pdfjsLib;
-
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
       if (file.type !== 'application/pdf') continue;
@@ -122,14 +118,13 @@ export default function InvertPage() {
       let totalPages = 0;
 
       // Try to get page count immediately
-      if (pdfjsLib) {
-         try {
-           const ab = await file.arrayBuffer();
-           const loadingTask = pdfjsLib.getDocument(ab);
-           const pdf = await loadingTask.promise;
-           totalPages = pdf.numPages;
-         } catch (e) { console.error(e); }
-      }
+      try {
+        const ab = await file.arrayBuffer();
+        const pdfjs = await initPdfWorker();
+        const loadingTask = pdfjs.getDocument(ab);
+        const pdf = await loadingTask.promise;
+        totalPages = pdf.numPages;
+      } catch (e) { console.error(e); }
 
       newItems.push({
         id,
@@ -158,7 +153,39 @@ export default function InvertPage() {
 
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i];
-        const { width, height } = page.getSize();
+
+        // Use raw MediaBox/CropBox instead of getSize() which adjusts for rotation.
+        // The content stream operates in the raw coordinate space.
+        const mediaBox = page.node.get(PDFName.of('MediaBox'));
+        const cropBox = page.node.get(PDFName.of('CropBox'));
+        let boxArr: number[] = [0, 0, 612, 792]; // fallback A4
+
+        const resolveBox = (box: any): number[] | null => {
+          if (!box) return null;
+          let resolved = box;
+          if (resolved instanceof PDFRef) {
+            resolved = pdfDoc.context.lookup(resolved);
+          }
+          if (resolved instanceof PDFArray) {
+            return [
+              (resolved.get(0) as any)?.numberValue ?? (resolved.get(0) as any)?.value ?? 0,
+              (resolved.get(1) as any)?.numberValue ?? (resolved.get(1) as any)?.value ?? 0,
+              (resolved.get(2) as any)?.numberValue ?? (resolved.get(2) as any)?.value ?? 612,
+              (resolved.get(3) as any)?.numberValue ?? (resolved.get(3) as any)?.value ?? 792,
+            ];
+          }
+          return null;
+        };
+
+        const resolvedCrop = resolveBox(cropBox);
+        const resolvedMedia = resolveBox(mediaBox);
+        if (resolvedCrop) boxArr = resolvedCrop;
+        else if (resolvedMedia) boxArr = resolvedMedia;
+
+        const bx = boxArr[0];
+        const by = boxArr[1];
+        const bw = boxArr[2] - boxArr[0];
+        const bh = boxArr[3] - boxArr[1];
 
         // 1. Create ExtGState with 'Difference' blend mode
         const extGState = pdfDoc.context.obj({
@@ -191,15 +218,8 @@ export default function InvertPage() {
         }
         (extGStateDict as any).set(PDFName.of(gsName), extGStateRef);
 
-        // 3. Inject inversion rect
-        const invertOps = `
-q
-/${gsName} gs
-1 1 1 rg
-0 0 ${width} ${height} re
-f
-Q
-`;
+        // 3. Inject inversion rect covering the full page box
+        const invertOps = `\nq\n/${gsName} gs\n1 1 1 rg\n${bx} ${by} ${bw} ${bh} re\nf\nQ\n`;
         const contentStreamRef = page.node.get(PDFName.of('Contents'));
         const invertStream = pdfDoc.context.flateStream(invertOps);
         const invertStreamRef = pdfDoc.context.register(invertStream);
@@ -319,16 +339,6 @@ Q
 
   return (
     <div className="page-container">
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-        onLoad={() => {
-          if ((window as any).pdfjsLib) {
-             (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-             setPdfLibLoaded(true);
-          }
-        }}
-        strategy="afterInteractive"
-      />
 
       <div className={`${styles.wrapper} animate-in`}>
         <div className="section-header">
@@ -452,7 +462,6 @@ Q
                      </div>
                      
                      <div className={styles.previewCanvasArea}>
-                       {!pdfLibLoaded && <div style={{padding:20}}>Loading engine...</div>}
                        {selectedItem.invertedUrl ? (
                           <canvas ref={invertedCanvasRef} style={{ maxWidth:'100%', borderRadius:8, boxShadow:'0 4px 12px rgba(0,0,0,0.2)' }} />
                        ) : (
