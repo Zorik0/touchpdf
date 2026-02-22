@@ -128,6 +128,44 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* ── Feature Badges ── */
+.featureBadges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 800px;
+    margin: 0 auto 40px;
+}
+
+.featureBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 100px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.featureBadge:hover {
+    color: var(--accent-1);
+    border-color: rgba(232, 115, 74, 0.3);
+    background: rgba(232, 115, 74, 0.06);
+    transform: translateY(-1px);
+}
+
+.visualProofWrap {
+    margin-bottom: 40px;
+}
+
 .emptySearch {
     text-align: center;
     padding: 60px 20px;
@@ -394,6 +432,21 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .visualProofWrap {
+        display: none;
+    }
+
+    .featureBadges {
+        max-width: 100%;
+        margin-bottom: 24px;
+        gap: 4px;
+    }
+
+    .featureBadge {
+        font-size: 0.65rem;
+        padding: 3px 8px;
     }
 }
 

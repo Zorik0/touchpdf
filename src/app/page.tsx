@@ -171,13 +171,23 @@ export default function HomePage() {
           )}
         </div>
 
+        {/* Feature Badges */}
+        <div className={`${styles.featureBadges} animate-in animate-delay-3`}>
+          {ALL_TOOLS.map(t => (
+            <Link key={t.href} href={t.href} className={styles.featureBadge}>
+              <t.icon size={12} />
+              {t.title}
+            </Link>
+          ))}
+        </div>
+
         {/* Trust Bar */}
         <div className="animate-in animate-delay-3">
           <TrustBar />
         </div>
 
-        {/* Visual Proof */}
-        <div className="animate-in animate-delay-3" style={{ marginBottom: 40 }}>
+        {/* Visual Proof — hidden on mobile */}
+        <div className={`${styles.visualProofWrap} animate-in animate-delay-3`}>
            <VisualProof />
         </div>
 
