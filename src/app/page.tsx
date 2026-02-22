@@ -22,12 +22,24 @@ import {
   RotateCw,
   Droplets,
   Lock,
-  Eraser,       // Redaction
-  Highlighter,  // Annotation (using Highlighter as proxy for Pen/Annotation)
-  Table,        // PDF to Excel
-  FileStack,    // Batch tools
-  EyeOff,       // Privacy cleaner
-  Printer       // Print Assistor
+  Eraser,
+  Highlighter,
+  Table,
+  FileStack,
+  EyeOff,
+  Printer,
+  Hash,
+  Palette,
+  ArrowDownUp,
+  FilePlus2,
+  Crop,
+  PenLine,
+  ImageDown,
+  QrCode,
+  Diff,
+  FileUser,
+  Receipt,
+  Award,
 } from 'lucide-react';
 import styles from './Home.module.css';
 import Logo from './components/Logo';
@@ -71,6 +83,27 @@ const ALL_TOOLS = [
   { href: '/batch-convert', type: 'pdf',  icon: FileStack,     title: 'Batch Convert',    desc: 'Process multiple files', cat: 'Batch Tools', keywords: 'batch bulk convert', badge: 'Pro' },
   { href: '/invert',       type: 'pdf',   icon: ArrowRightLeft, title: 'Invert Colors',   desc: 'Dark mode for PDFs',     cat: 'Batch Tools', keywords: 'invert dark mode color' },
   { href: '/md-to-pdf',    type: 'html',  icon: FileCode,      title: 'Markdown to PDF',  desc: 'Convert Code/MD',        cat: 'Batch Tools', keywords: 'markdown md code' },
+  { href: '/grayscale',    type: 'pdf',   icon: Palette,       title: 'Grayscale PDF',    desc: 'Convert to B&W',         cat: 'Batch Tools', keywords: 'grayscale black white bw' },
+
+  // Page Tools
+  { href: '/page-numbers', type: 'pdf',   icon: Hash,          title: 'Page Numbers',     desc: 'Add sequential numbers', cat: 'Page Tools', keywords: 'page number header footer', badge: 'New' },
+  { href: '/reverse-pdf',  type: 'pdf',   icon: ArrowDownUp,   title: 'Reverse Pages',    desc: 'Flip page order',        cat: 'Page Tools', keywords: 'reverse flip order' },
+  { href: '/blank-pages',  type: 'pdf',   icon: FilePlus2,     title: 'Add Blank Pages',  desc: 'Insert blank pages',     cat: 'Page Tools', keywords: 'blank insert empty page' },
+  { href: '/crop-pdf',     type: 'pdf',   icon: Crop,          title: 'Crop PDF',         desc: 'Trim page margins',      cat: 'Page Tools', keywords: 'crop trim margin whitespace' },
+  { href: '/metadata-editor', type: 'pdf', icon: FileText,     title: 'Metadata Editor',  desc: 'View & edit PDF info',   cat: 'Page Tools', keywords: 'metadata title author properties' },
+
+  // Sign & Create
+  { href: '/sign-pdf',     type: 'pdf',   icon: PenLine,       title: 'Sign PDF',         desc: 'Draw or type signature', cat: 'Sign & Create', keywords: 'sign signature draw esign', badge: 'Popular' },
+  { href: '/compare-pdf',  type: 'pdf',   icon: Diff,          title: 'Compare PDFs',     desc: 'Side-by-side diff',      cat: 'Sign & Create', keywords: 'compare diff difference side by side' },
+
+  // Image Tools
+  { href: '/compress-image', type: 'image', icon: ImageDown,   title: 'Compress Images',  desc: 'Reduce image sizes',     cat: 'Image Tools', keywords: 'compress image jpg png webp resize', badge: 'New' },
+  { href: '/qr-code',      type: 'other', icon: QrCode,        title: 'QR Code',          desc: 'Generate QR codes',      cat: 'Image Tools', keywords: 'qr code generate barcode' },
+
+  // Generators
+  { href: '/resume-builder', type: 'other', icon: FileUser,    title: 'Resume Builder',   desc: 'Create resume PDF',      cat: 'Generators', keywords: 'resume cv builder create', badge: 'New' },
+  { href: '/invoice-generator', type: 'other', icon: Receipt,  title: 'Invoice Generator', desc: 'Create invoices',       cat: 'Generators', keywords: 'invoice bill receipt generator' },
+  { href: '/certificate-generator', type: 'other', icon: Award, title: 'Certificate',     desc: 'Generate certificates',  cat: 'Generators', keywords: 'certificate award achievement' },
 ];
 
 const CATEGORIES = [
@@ -78,7 +111,11 @@ const CATEGORIES = [
   'Organize & Manage',
   'Convert & Export',
   'Security & Privacy',
-  'Batch Tools'
+  'Batch Tools',
+  'Page Tools',
+  'Sign & Create',
+  'Image Tools',
+  'Generators',
 ];
 
 export default function HomePage() {
