@@ -13,6 +13,10 @@ import {
   Grid,
   Ruler,
   Settings2,
+  Plus,
+  Minus,
+  ImagePlus,
+  Hash,
 } from 'lucide-react';
 import styles from './PrintAssistor.module.css';
 import { useToast } from '../components/ui/Toast';
@@ -74,6 +78,7 @@ const toMm = (val: number, unit: Unit, dpi: number): number => {
 };
 
 interface UploadedImage {
+  id: string;
   file: File;
   url: string;
   width: number;
@@ -81,10 +86,11 @@ interface UploadedImage {
 }
 
 export default function PrintAssistorPage() {
-  // Image state
-  const [image, setImage] = useState<UploadedImage | null>(null);
+  // Multi-image state
+  const [images, setImages] = useState<UploadedImage[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addMoreRef = useRef<HTMLInputElement>(null);
 
   // Settings
   const [selectedPreset, setSelectedPreset] = useState<number>(0);
@@ -96,6 +102,10 @@ export default function PrintAssistorPage() {
   const [spacingMm, setSpacingMm] = useState(3);
   const [marginMm, setMarginMm] = useState(10);
 
+  // Quantity control
+  const [copyCount, setCopyCount] = useState<number>(0); // 0 = auto (fill sheet)
+  const [autoFill, setAutoFill] = useState(true);
+
   // Generation
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -103,13 +113,22 @@ export default function PrintAssistorPage() {
 
   const paper = PAPER_SIZES[paperIndex];
 
-  // ── Computed: how many photosfit ──
+  // ── Computed: max photos that fit ──
   const cols = Math.floor((paper.widthMm - marginMm * 2 + spacingMm) / (photoWidthMm + spacingMm)) || 0;
   const rows = Math.floor((paper.heightMm - marginMm * 2 + spacingMm) / (photoHeightMm + spacingMm)) || 0;
-  const totalCopies = cols * rows;
+  const maxCopies = cols * rows;
+
+  // Actual copies to print
+  const actualCopies = autoFill ? maxCopies : Math.min(copyCount, maxCopies);
 
   // ── Preview Canvas ──
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Build the slot-to-image mapping: cycle through images for each slot
+  const getImageForSlot = useCallback((slotIndex: number): UploadedImage | null => {
+    if (images.length === 0) return null;
+    return images[slotIndex % images.length];
+  }, [images]);
 
   const drawPreview = useCallback(() => {
     const canvas = canvasRef.current;
@@ -141,27 +160,31 @@ export default function PrintAssistorPage() {
     if (photoWidthMm <= 0 || photoHeightMm <= 0) return;
 
     // Draw photo slots
+    let slotIndex = 0;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
+        if (slotIndex >= actualCopies) break;
+
         const x = (marginMm + c * (photoWidthMm + spacingMm)) * scale;
         const y = (marginMm + r * (photoHeightMm + spacingMm)) * scale;
         const w = photoWidthMm * scale;
         const h = photoHeightMm * scale;
 
-        if (image) {
+        const slotImage = getImageForSlot(slotIndex);
+
+        if (slotImage) {
           // Draw image cropped to fill
           const imgEl = new Image();
-          imgEl.src = image.url;
-          // We need to use drawImage with object-fit: cover logic
-          const imgAR = image.width / image.height;
+          imgEl.src = slotImage.url;
+          const imgAR = slotImage.width / slotImage.height;
           const slotAR = w / h;
-          let sx = 0, sy = 0, sw = image.width, sh = image.height;
+          let sx = 0, sy = 0, sw = slotImage.width, sh = slotImage.height;
           if (imgAR > slotAR) {
-            sw = image.height * slotAR;
-            sx = (image.width - sw) / 2;
+            sw = slotImage.height * slotAR;
+            sx = (slotImage.width - sw) / 2;
           } else {
-            sh = image.width / slotAR;
-            sy = (image.height - sh) / 2;
+            sh = slotImage.width / slotAR;
+            sy = (slotImage.height - sh) / 2;
           }
           ctx.drawImage(imgEl, sx, sy, sw, sh, x, y, w, h);
         } else {
@@ -177,43 +200,59 @@ export default function PrintAssistorPage() {
         ctx.strokeStyle = '#aaaaaa';
         ctx.lineWidth = 0.5;
         const corner = 3 * scale;
-        // top-left
         ctx.beginPath(); ctx.moveTo(x, y + corner); ctx.lineTo(x, y); ctx.lineTo(x + corner, y); ctx.stroke();
-        // top-right
         ctx.beginPath(); ctx.moveTo(x + w - corner, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + corner); ctx.stroke();
-        // bottom-left
         ctx.beginPath(); ctx.moveTo(x, y + h - corner); ctx.lineTo(x, y + h); ctx.lineTo(x + corner, y + h); ctx.stroke();
-        // bottom-right
         ctx.beginPath(); ctx.moveTo(x + w - corner, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - corner); ctx.stroke();
+
+        slotIndex++;
       }
+      if (slotIndex >= actualCopies) break;
     }
-  }, [image, photoWidthMm, photoHeightMm, paper, spacingMm, marginMm, rows, cols]);
+  }, [images, photoWidthMm, photoHeightMm, paper, spacingMm, marginMm, rows, cols, actualCopies, getImageForSlot]);
 
   useEffect(() => {
     drawPreview();
   }, [drawPreview]);
 
   // ── Image Upload ──
-  const handleFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      addToast('Please upload an image file', 'error');
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    const imgEl = new Image();
-    imgEl.onload = () => {
-      setImage({ file, url, width: imgEl.width, height: imgEl.height });
-    };
-    imgEl.src = url;
+  const addImages = (files: FileList | null) => {
+    if (!files) return;
+    const newItems: Promise<UploadedImage>[] = Array.from(files)
+      .filter(f => f.type.startsWith('image/'))
+      .map(file => {
+        return new Promise<UploadedImage>((resolve) => {
+          const url = URL.createObjectURL(file);
+          const imgEl = new Image();
+          imgEl.onload = () => {
+            resolve({
+              id: Math.random().toString(36).substring(7),
+              file,
+              url,
+              width: imgEl.width,
+              height: imgEl.height,
+            });
+          };
+          imgEl.src = url;
+        });
+      });
+
+    Promise.all(newItems).then(loaded => {
+      setImages(prev => [...prev, ...loaded]);
+    });
   };
 
-  const handleFiles = (files: FileList | null) => {
-    if (files && files[0]) handleFile(files[0]);
+  const removeImage = (id: string) => {
+    setImages(prev => {
+      const item = prev.find(i => i.id === id);
+      if (item) URL.revokeObjectURL(item.url);
+      return prev.filter(i => i.id !== id);
+    });
   };
 
-  const removeImage = () => {
-    if (image) URL.revokeObjectURL(image.url);
-    setImage(null);
+  const removeAllImages = () => {
+    images.forEach(img => URL.revokeObjectURL(img.url));
+    setImages([]);
   };
 
   // ── Preset Selection ──
@@ -234,7 +273,7 @@ export default function PrintAssistorPage() {
     const n = parseFloat(val);
     if (!isNaN(n) && n > 0) {
       setPhotoWidthMm(toMm(n, unit, dpi));
-      setSelectedPreset(PRESETS.length - 1); // custom
+      setSelectedPreset(PRESETS.length - 1);
     }
   };
 
@@ -242,17 +281,46 @@ export default function PrintAssistorPage() {
     const n = parseFloat(val);
     if (!isNaN(n) && n > 0) {
       setPhotoHeightMm(toMm(n, unit, dpi));
-      setSelectedPreset(PRESETS.length - 1); // custom
+      setSelectedPreset(PRESETS.length - 1);
+    }
+  };
+
+  // ── Quantity Helpers ──
+  const incrementCopies = () => {
+    if (autoFill) {
+      setAutoFill(false);
+      setCopyCount(Math.min(maxCopies, maxCopies));
+    } else {
+      setCopyCount(prev => Math.min(prev + 1, maxCopies));
+    }
+  };
+
+  const decrementCopies = () => {
+    if (autoFill) {
+      setAutoFill(false);
+      setCopyCount(Math.max(1, maxCopies - 1));
+    } else {
+      setCopyCount(prev => Math.max(1, prev - 1));
+    }
+  };
+
+  const toggleAutoFill = () => {
+    if (!autoFill) {
+      setAutoFill(true);
+      setCopyCount(0);
+    } else {
+      setAutoFill(false);
+      setCopyCount(maxCopies);
     }
   };
 
   // ── Generate PDF ──
   const generatePdf = async () => {
-    if (!image) {
-      addToast('Upload a photo first', 'error');
+    if (images.length === 0) {
+      addToast('Upload at least one photo first', 'error');
       return;
     }
-    if (totalCopies === 0) {
+    if (actualCopies === 0) {
       addToast('Photo too large for this paper size', 'error');
       return;
     }
@@ -267,53 +335,63 @@ export default function PrintAssistorPage() {
       });
 
       // Draw each photo tile
+      let slotIndex = 0;
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
+          if (slotIndex >= actualCopies) break;
+
           const x = marginMm + c * (photoWidthMm + spacingMm);
           const y = marginMm + r * (photoHeightMm + spacingMm);
 
-          // Draw the image — jsPDF accepts object URLs
-          const format = image.file.type === 'image/png' ? 'PNG' : 'JPEG';
-          try {
-            pdf.addImage(image.url, format, x, y, photoWidthMm, photoHeightMm);
-          } catch {
-            // Fallback: convert to canvas data URL
-            const canvas = document.createElement('canvas');
-            canvas.width = image.width;
-            canvas.height = image.height;
-            const ctx2 = canvas.getContext('2d');
-            if (ctx2) {
-              const imgEl = new Image();
-              imgEl.src = image.url;
-              await new Promise(r => setTimeout(r, 50));
-              ctx2.drawImage(imgEl, 0, 0);
-              pdf.addImage(canvas.toDataURL(image.file.type), format, x, y, photoWidthMm, photoHeightMm);
+          const slotImage = getImageForSlot(slotIndex);
+          if (slotImage) {
+            const format = slotImage.file.type === 'image/png' ? 'PNG' : 'JPEG';
+            try {
+              pdf.addImage(slotImage.url, format, x, y, photoWidthMm, photoHeightMm);
+            } catch {
+              // Fallback: convert to canvas data URL
+              const canvas = document.createElement('canvas');
+              canvas.width = slotImage.width;
+              canvas.height = slotImage.height;
+              const ctx2 = canvas.getContext('2d');
+              if (ctx2) {
+                const imgEl = new Image();
+                imgEl.src = slotImage.url;
+                await new Promise(r => setTimeout(r, 50));
+                ctx2.drawImage(imgEl, 0, 0);
+                pdf.addImage(canvas.toDataURL(slotImage.file.type), format, x, y, photoWidthMm, photoHeightMm);
+              }
             }
           }
+          slotIndex++;
         }
+        if (slotIndex >= actualCopies) break;
       }
 
       // Light cut guides
       pdf.setDrawColor(180, 180, 180);
       pdf.setLineWidth(0.15);
+      slotIndex = 0;
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
+          if (slotIndex >= actualCopies) break;
           const x = marginMm + c * (photoWidthMm + spacingMm);
           const y = marginMm + r * (photoHeightMm + spacingMm);
           const w = photoWidthMm;
           const h = photoHeightMm;
-          const g = 2; // guide length mm
-          // corners
+          const g = 2;
           pdf.line(x, y, x + g, y); pdf.line(x, y, x, y + g);
           pdf.line(x + w, y, x + w - g, y); pdf.line(x + w, y, x + w, y + g);
           pdf.line(x, y + h, x + g, y + h); pdf.line(x, y + h, x, y + h - g);
           pdf.line(x + w, y + h, x + w - g, y + h); pdf.line(x + w, y + h, x + w, y + h - g);
+          slotIndex++;
         }
+        if (slotIndex >= actualCopies) break;
       }
 
       const presetName = PRESETS[selectedPreset].name.toLowerCase().replace(/\s+/g, '-');
-      pdf.save(`print-${presetName}-${cols}x${rows}.pdf`);
-      addToast(`PDF generated — ${totalCopies} copies on ${paper.name}`, 'success');
+      pdf.save(`print-${presetName}-${actualCopies}copies.pdf`);
+      addToast(`PDF generated — ${actualCopies} copies on ${paper.name}`, 'success');
     } catch (err) {
       console.error(err);
       addToast('Error generating PDF', 'error');
@@ -328,7 +406,7 @@ export default function PrintAssistorPage() {
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragActive(false);
-    if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
+    if (e.dataTransfer.files?.length) addImages(e.dataTransfer.files);
   };
 
   return (
@@ -342,12 +420,12 @@ export default function PrintAssistorPage() {
             Print-Ready <span className="gradient-text">Photo Prep</span>
           </h1>
           <p className="section-subtitle">
-            Prepare passport, visa, ID, and custom-size photos for printing. Tiles copies onto a sheet and generates a print-ready PDF.
+            Prepare passport, visa, ID, and custom-size photos for printing. Upload one or multiple photos, control quantities, and generate a print-ready PDF.
           </p>
         </div>
 
         {/* Upload Zone */}
-        {!image ? (
+        {images.length === 0 ? (
           <div
             className={`drop-zone ${dragActive ? 'active' : ''}`}
             onClick={() => fileInputRef.current?.click()}
@@ -359,28 +437,72 @@ export default function PrintAssistorPage() {
               <Upload size={48} strokeWidth={1} />
             </div>
             <div className="drop-zone-text">
-              <strong>Drop your photo here</strong> (JPG, PNG, WebP)
+              <strong>Drop your photo(s) here</strong> (JPG, PNG, WebP)
+              <br />
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Upload one photo to repeat it, or multiple for a mix
+              </span>
             </div>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              multiple
               style={{ display: 'none' }}
-              onChange={(e) => handleFiles(e.target.files)}
+              onChange={(e) => addImages(e.target.files)}
             />
           </div>
         ) : (
-          <div className={styles.uploadedThumb}>
-            <img src={image.url} alt="uploaded" className={styles.thumbImg} />
-            <div className={styles.thumbInfo}>
-              <div className={styles.thumbName}>{image.file.name}</div>
-              <div className={styles.thumbMeta}>
-                {image.width} × {image.height}px • {(image.file.size / 1024).toFixed(1)} KB
+          <div className={styles.imageListSection}>
+            <div className={styles.imageListHeader}>
+              <span className={styles.imageListTitle}>
+                <ImagePlus size={14} /> {images.length} photo{images.length !== 1 ? 's' : ''} uploaded
+              </span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  className="btn btn-ghost"
+                  style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                  onClick={() => addMoreRef.current?.click()}
+                >
+                  <Plus size={14} /> Add More
+                </button>
+                <button
+                  className="btn btn-ghost"
+                  style={{ padding: '6px 14px', fontSize: '0.78rem', color: 'var(--danger)' }}
+                  onClick={removeAllImages}
+                >
+                  <X size={14} /> Clear All
+                </button>
               </div>
+              <input
+                ref={addMoreRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={(e) => { addImages(e.target.files); e.target.value = ''; }}
+              />
             </div>
-            <button className={styles.thumbRemove} onClick={removeImage} title="Remove">
-              <X size={14} />
-            </button>
+            <div className={styles.imageChips}>
+              {images.map((img) => (
+                <div key={img.id} className={styles.imageChip}>
+                  <img src={img.url} alt="thumb" className={styles.chipThumb} />
+                  <span className={styles.chipName}>{img.file.name}</span>
+                  <button
+                    className={styles.chipRemove}
+                    onClick={() => removeImage(img.id)}
+                    title="Remove"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            {images.length > 1 && (
+              <div className={styles.multiImageHint}>
+                Photos will cycle across slots: slot 1 gets photo 1, slot 2 gets photo 2, etc.
+              </div>
+            )}
           </div>
         )}
 
@@ -487,6 +609,46 @@ export default function PrintAssistorPage() {
               </select>
             </div>
 
+            {/* Quantity Control */}
+            <div className={styles.field} style={{ marginBottom: 12 }}>
+              <label className={styles.fieldLabel}>
+                <Hash size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                Number of Copies
+              </label>
+              <div className={styles.quantityRow}>
+                <button
+                  className={styles.qtyBtn}
+                  onClick={decrementCopies}
+                  disabled={!autoFill && copyCount <= 1}
+                >
+                  <Minus size={14} />
+                </button>
+                <div className={styles.qtyDisplay}>
+                  {autoFill ? maxCopies : copyCount}
+                </div>
+                <button
+                  className={styles.qtyBtn}
+                  onClick={incrementCopies}
+                  disabled={!autoFill && copyCount >= maxCopies}
+                >
+                  <Plus size={14} />
+                </button>
+                <button
+                  className={`${styles.autoFillBtn} ${autoFill ? styles.autoFillActive : ''}`}
+                  onClick={toggleAutoFill}
+                  title={autoFill ? 'Auto-fill is ON — using max copies' : 'Click to auto-fill sheet'}
+                >
+                  {autoFill ? 'Auto ✓' : 'Auto'}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                {autoFill
+                  ? `Auto-fill: ${maxCopies} copies fit on ${paper.name}`
+                  : `${copyCount} of ${maxCopies} max slots used`
+                }
+              </div>
+            </div>
+
             {/* Spacing & Margin */}
             <div className={styles.fieldRow}>
               <div className={styles.field}>
@@ -525,7 +687,7 @@ export default function PrintAssistorPage() {
               Print Preview
             </div>
             <div className={styles.previewInfo}>
-              {paper.name} • {cols}×{rows} grid
+              {paper.name} • {actualCopies} of {maxCopies} slots
             </div>
           </div>
 
@@ -536,7 +698,7 @@ export default function PrintAssistorPage() {
           {/* Stats */}
           <div className={styles.statsRow}>
             <div className={styles.statChip}>
-              <Grid size={12} /> {totalCopies} copies
+              <Grid size={12} /> {actualCopies} copies
             </div>
             <div className={styles.statChip}>
               <Maximize2 size={12} /> {displayW} × {displayH} {unit}
@@ -547,6 +709,11 @@ export default function PrintAssistorPage() {
             <div className={styles.statChip}>
               {dpi} DPI
             </div>
+            {images.length > 1 && (
+              <div className={styles.statChip}>
+                <ImagePlus size={12} /> {images.length} photos
+              </div>
+            )}
           </div>
         </div>
 
@@ -555,7 +722,7 @@ export default function PrintAssistorPage() {
           <button
             className="btn btn-primary"
             onClick={generatePdf}
-            disabled={!image || isGenerating || totalCopies === 0}
+            disabled={images.length === 0 || isGenerating || actualCopies === 0}
           >
             {isGenerating ? (
               <><Loader2 className="spinner" /> Generating...</>
@@ -563,9 +730,9 @@ export default function PrintAssistorPage() {
               <><Download size={18} /> Download Print PDF</>
             )}
           </button>
-          {image && (
-            <button className="btn btn-ghost" onClick={() => { removeImage(); fileInputRef.current?.click(); }}>
-              <Upload size={16} /> Change Photo
+          {images.length > 0 && (
+            <button className="btn btn-ghost" onClick={() => { removeAllImages(); fileInputRef.current?.click(); }}>
+              <Upload size={16} /> Start Over
             </button>
           )}
         </div>

@@ -243,51 +243,112 @@
     flex-wrap: wrap;
 }
 
-/* ── Image Preview Thumb ── */
-.uploadedThumb {
+/* ── Multi-Image List ── */
+.imageListSection {
     margin-top: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 16px;
+}
+
+.imageListHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.imageListTitle {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px;
+    gap: 6px;
+}
+
+.imageChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.imageChip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
     background: var(--bg-card);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
+    transition: border-color var(--transition);
 }
 
-.thumbImg {
-    width: 56px;
-    height: 56px;
-    border-radius: 6px;
+.imageChip:hover {
+    border-color: var(--glass-border-hover);
+}
+
+.chipThumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
     object-fit: cover;
-    border: none;
 }
 
-.thumbInfo {
-    flex: 1;
-    overflow: hidden;
-}
-
-.thumbName {
-    font-size: 0.85rem;
-    font-weight: 500;
+.chipName {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    max-width: 120px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.thumbMeta {
-    font-size: 0.72rem;
+.chipRemove {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
     color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    padding: 0;
 }
 
-.thumbRemove {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+.chipRemove:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.multiImageHint {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ── Quantity Control ── */
+.quantityRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.qtyBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--glass-border);
     background: var(--bg-card);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -295,10 +356,51 @@
     transition: all var(--transition);
 }
 
-.thumbRemove:hover {
-    background: var(--danger);
-    border-color: var(--danger);
-    color: #fff;
+.qtyBtn:hover:not(:disabled) {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    background: var(--bg-card-hover);
+}
+
+.qtyBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.qtyDisplay {
+    min-width: 48px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 4px 0;
+}
+
+.autoFillBtn {
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    margin-left: 4px;
+    letter-spacing: 0.02em;
+}
+
+.autoFillBtn:hover {
+    border-color: var(--accent-3);
+    color: var(--accent-3);
+}
+
+.autoFillActive {
+    background: rgba(46, 196, 182, 0.1);
+    border-color: var(--accent-3);
+    color: var(--accent-3);
 }
 
 /* ── Responsive ── */
@@ -325,5 +427,18 @@
 
     .actions .btn {
         width: 100%;
+    }
+
+    .imageListHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .chipName {
+        max-width: 80px;
+    }
+
+    .quantityRow {
+        flex-wrap: wrap;
     }
 }
