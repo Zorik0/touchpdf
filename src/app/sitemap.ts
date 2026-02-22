@@ -13,6 +13,7 @@ const PAGES = [
     { path: '/invert', priority: 0.8, freq: 'weekly' as const },
     { path: '/pdf-to-png', priority: 0.8, freq: 'weekly' as const },
     { path: '/png-to-pdf', priority: 0.8, freq: 'weekly' as const },
+    { path: '/print-assistor', priority: 0.8, freq: 'weekly' as const },
     { path: '/organize', priority: 0.8, freq: 'weekly' as const },
     { path: '/extract-text', priority: 0.8, freq: 'weekly' as const },
     { path: '/md-to-pdf', priority: 0.7, freq: 'weekly' as const },

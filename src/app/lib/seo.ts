@@ -106,6 +106,12 @@ const TOOL_SEO: Record<string, ToolSEO> = {
         keywords: ['protect pdf', 'password pdf', 'encrypt pdf', 'lock pdf', 'secure pdf online'],
         path: '/protect-pdf',
     },
+    'print-assistor': {
+        title: 'Print Assistor — Passport & ID Photo Print Prep Free',
+        description: 'Prepare passport, visa, ID card, and custom-size photos for printing. Auto-tiles copies onto a sheet and generates a print-ready PDF. 100% client-side.',
+        keywords: ['passport photo print', 'print passport size photo', 'visa photo online', 'id card photo', 'photo print tool', 'passport photo maker free'],
+        path: '/print-assistor',
+    },
     'privacy': {
         title: 'Privacy Policy',
         description: 'TouchPDF Privacy Policy. Learn how we handle your data — spoiler: we don\'t.',

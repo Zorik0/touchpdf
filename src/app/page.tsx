@@ -26,7 +26,8 @@ import {
   Highlighter,  // Annotation (using Highlighter as proxy for Pen/Annotation)
   Table,        // PDF to Excel
   FileStack,    // Batch tools
-  EyeOff        // Privacy cleaner
+  EyeOff,       // Privacy cleaner
+  Printer       // Print Assistor
 } from 'lucide-react';
 import styles from './Home.module.css';
 import Logo from './components/Logo';
@@ -55,6 +56,7 @@ const ALL_TOOLS = [
   { href: '/pdf-to-excel', type: 'excel', icon: Table,         title: 'PDF to Excel',     desc: 'Extract tables to XLSX', cat: 'Convert & Export', keywords: 'excel xlsx table spreadsheet', badge: 'New' },
   { href: '/pdf-to-png',   type: 'image', icon: ImageIcon,     title: 'PDF to JPG/PNG',   desc: 'Save pages as images',   cat: 'Convert & Export', keywords: 'jpg png image photo' },
   { href: '/png-to-pdf',   type: 'image', icon: ImageIcon,     title: 'JPG to PDF',       desc: 'Convert images to PDF',  cat: 'Convert & Export', keywords: 'jpg png image photo' },
+  { href: '/print-assistor', type: 'image', icon: Printer,    title: 'Print Assistor',   desc: 'Passport & ID photo prep', cat: 'Convert & Export', keywords: 'print passport visa photo size id card wallet', badge: 'New' },
   { href: '/word-to-pdf',  type: 'word',  icon: FileText,      title: 'Word to PDF',      desc: 'Docx to PDF',            cat: 'Convert & Export', keywords: 'word docx' },
   { href: '/ppt-to-pdf',   type: 'ppt',   icon: Presentation,  title: 'PPT to PDF',       desc: 'PowerPoint to PDF',      cat: 'Convert & Export', keywords: 'ppt pptx powerpoint' },
   

@@ -20,6 +20,7 @@ import {
   ArrowRightLeft,
   FileCode,
   Image as LucideImage,
+  Printer,
 } from 'lucide-react';
 import styles from './MobileBottomNav.module.css';
 
@@ -31,6 +32,7 @@ const allTools = [
   { href: '/rotate-pdf', label: 'Rotate', icon: RotateCw },
   { href: '/pdf-to-png', label: 'PDF → Image', icon: LucideImage },
   { href: '/png-to-pdf', label: 'Image → PDF', icon: LucideImage },
+  { href: '/print-assistor', label: 'Print', icon: Printer },
   { href: '/word-to-pdf', label: 'Word → PDF', icon: FileText },
   { href: '/watermark-pdf', label: 'Watermark', icon: Droplets },
   { href: '/protect-pdf', label: 'Protect', icon: Lock },
