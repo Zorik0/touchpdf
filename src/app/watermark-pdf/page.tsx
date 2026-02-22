@@ -3,56 +3,66 @@
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import { useToast } from '../components/ui/Toast';
-import { Droplets, Upload, FileText, Download, Loader2, ListRestart } from 'lucide-react';
+import { Droplets, Upload, FileText, Download, Loader2, ListRestart, X, Plus } from 'lucide-react';
 
 export default function WatermarkPdfPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [watermarkText, setWatermarkText] = useState('CONFIDENTIAL');
   const [opacity, setOpacity] = useState(0.15);
   const [fontSize, setFontSize] = useState(60);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = useCallback(async (f: File) => {
-    if (f.type !== 'application/pdf') return;
-    setFile(f);
+  const addFiles = useCallback((fl: FileList | null) => {
+    if (!fl) return;
+    const pdfs = Array.from(fl).filter(f => f.type === 'application/pdf');
+    setFiles(prev => [...prev, ...pdfs]);
   }, []);
 
+  const removeFile = (i: number) => setFiles(prev => prev.filter((_, idx) => idx !== i));
+
   const addWatermark = async () => {
-    if (!file || !watermarkText.trim()) return;
+    if (files.length === 0 || !watermarkText.trim()) return;
     setIsProcessing(true);
+    setProgress(0);
 
     try {
-      const ab = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(ab, { ignoreEncryption: true });
-      const font = await pdf.embedFont(StandardFonts.HelveticaBold);
-      const pages = pdf.getPages();
+      for (let fi = 0; fi < files.length; fi++) {
+        setProgress(Math.round(((fi + 1) / files.length) * 100));
+        const file = files[fi];
+        const ab = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(ab, { ignoreEncryption: true });
+        const font = await pdf.embedFont(StandardFonts.HelveticaBold);
+        const pages = pdf.getPages();
 
-      for (const page of pages) {
-        const { width, height } = page.getSize();
-        const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
+        for (const page of pages) {
+          const { width, height } = page.getSize();
+          const textWidth = font.widthOfTextAtSize(watermarkText, fontSize);
 
-        page.drawText(watermarkText, {
-          x: (width - textWidth) / 2,
-          y: height / 2,
-          size: fontSize,
-          font,
-          color: rgb(0.5, 0.5, 0.5),
-          opacity: opacity,
-          rotate: degrees(-45),
-        });
+          page.drawText(watermarkText, {
+            x: (width - textWidth) / 2,
+            y: height / 2,
+            size: fontSize,
+            font,
+            color: rgb(0.5, 0.5, 0.5),
+            opacity: opacity,
+            rotate: degrees(-45),
+          });
+        }
+
+        const bytes = await pdf.save();
+        const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${file.name.replace('.pdf', '')}_watermarked.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
       }
-
-      const bytes = await pdf.save();
-      const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${file.name.replace('.pdf', '')}_watermarked.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
+      addToast(`Watermarked ${files.length} file(s)`, 'success');
     } catch (err) { 
       console.error(err); 
       addToast('Error adding watermark', 'error'); 
@@ -60,10 +70,10 @@ export default function WatermarkPdfPage() {
     finally { setIsProcessing(false); }
   };
 
-  const reset = () => { setFile(null); };
+  const reset = () => { setFiles([]); };
   const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragActive(true); };
   const onDragLeave = () => setDragActive(false);
-  const onDrop = (e: React.DragEvent) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); };
+  const onDrop = (e: React.DragEvent) => { e.preventDefault(); setDragActive(false); addFiles(e.dataTransfer.files); };
 
   return (
     <div className="page-container">
@@ -71,27 +81,43 @@ export default function WatermarkPdfPage() {
         <div className="section-header">
           <div className="section-badge"><Droplets size={14} /> Watermark</div>
           <h1 className="section-title">Add <span className="gradient-text">Watermark</span></h1>
-          <p className="section-subtitle">Stamp text watermarks on every page of your PDF. Customizable text, size, and opacity.</p>
+          <p className="section-subtitle">Stamp text watermarks on every page. Supports batch processing — watermark multiple PDFs at once.</p>
         </div>
 
-        {!file ? (
+        {files.length === 0 ? (
           <div className={`drop-zone ${dragActive ? 'active' : ''}`}
             onClick={() => fileInputRef.current?.click()}
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
             <div className="drop-zone-icon"><Upload size={48} strokeWidth={1} /></div>
-            <div className="drop-zone-text"><strong>Drop PDF here</strong> to watermark</div>
-            <input ref={fileInputRef} type="file" accept=".pdf" style={{ display: 'none' }}
-              onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            <div className="drop-zone-text"><strong>Drop PDFs here</strong> to watermark (supports multiple)</div>
+            <input ref={fileInputRef} type="file" accept=".pdf" multiple style={{ display: 'none' }}
+              onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
           </div>
         ) : (
-          <div className="animate-in" style={{ maxWidth: 520, margin: '0 auto' }}>
+          <div className="animate-in" style={{ maxWidth: 600, margin: '0 auto' }}>
             <div className="glass-card" style={{ padding: 24, borderRadius: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--glass-border)' }}>
-                <div style={{ width: 44, height: 44, background: 'var(--bg-secondary)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={22} /></div>
-                <div style={{ flex: 1 }}><div style={{ fontWeight: 600 }}>{file.name}</div></div>
-                <button className="btn btn-ghost" onClick={reset} style={{ padding: 8 }}><ListRestart size={18} /></button>
+              {/* File list */}
+              <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid var(--glass-border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>{files.length} PDF(s)</span>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => fileInputRef.current?.click()}><Plus size={12} /> Add More</button>
+                    <button className="btn btn-ghost" onClick={reset} style={{ padding: '4px 10px', fontSize: '0.75rem' }}><ListRestart size={12} /> Clear</button>
+                  </div>
+                  <input ref={fileInputRef} type="file" accept=".pdf" multiple style={{ display: 'none' }}
+                    onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
+                </div>
+                {files.map((f, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', fontSize: '0.82rem' }}>
+                    <FileText size={14} style={{ color: 'var(--text-muted)' }} />
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.name}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{(f.size / 1024).toFixed(0)} KB</span>
+                    <button onClick={() => removeFile(i)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}><X size={12} /></button>
+                  </div>
+                ))}
               </div>
 
+              {/* Settings */}
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontWeight: 600, marginBottom: 8, fontSize: '0.9rem' }}>Watermark Text</label>
                 <input type="text" value={watermarkText} onChange={e => setWatermarkText(e.target.value)}
@@ -109,9 +135,15 @@ export default function WatermarkPdfPage() {
                 </div>
               </div>
 
+              {isProcessing && (
+                <div className="progress-bar" style={{ marginBottom: 12 }}>
+                  <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
+                </div>
+              )}
+
               <button className="btn btn-primary" onClick={addWatermark} disabled={isProcessing || !watermarkText.trim()}
                 style={{ width: '100%', justifyContent: 'center', padding: 14 }}>
-                {isProcessing ? <><Loader2 className="spinner" /> Processing...</> : <><Download size={18} /> Add Watermark & Download</>}
+                {isProcessing ? <><Loader2 className="spinner" /> Processing {progress}%...</> : <><Download size={18} /> Watermark {files.length > 1 ? `All ${files.length} PDFs` : '& Download'}</>}
               </button>
             </div>
           </div>
