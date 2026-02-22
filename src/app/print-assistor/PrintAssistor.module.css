@@ -328,11 +328,153 @@
     color: #fff;
 }
 
+.chipAdjust {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    padding: 0;
+}
+
+.chipAdjust:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+    background: rgba(232, 115, 74, 0.08);
+}
+
+.imageChipActive {
+    border-color: var(--accent-1);
+    background: rgba(232, 115, 74, 0.06);
+    box-shadow: 0 0 0 1px var(--accent-1);
+}
+
 .multiImageHint {
     margin-top: 10px;
     font-size: 0.7rem;
     color: var(--text-muted);
     font-style: italic;
+}
+
+/* ── Adjust Position Panel ── */
+.adjustSection {
+    margin-top: 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--accent-1);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(232, 115, 74, 0.08);
+}
+
+.adjustHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.adjustTitle {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adjustClose {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.adjustClose:hover {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.adjustBody {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.adjustCanvasWrap {
+    position: relative;
+    display: inline-block;
+}
+
+.adjustCanvas {
+    display: block;
+    border-radius: var(--radius-sm);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.adjustCanvas:active {
+    cursor: grabbing;
+}
+
+.adjustHint {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 100px;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.adjustInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.adjustInfoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.adjustInfoLabel {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 /* ── Quantity Control ── */
@@ -440,5 +582,14 @@
 
     .quantityRow {
         flex-wrap: wrap;
+    }
+
+    .adjustBody {
+        grid-template-columns: 1fr;
+    }
+
+    .adjustCanvas {
+        width: 100%;
+        height: auto;
     }
 }
