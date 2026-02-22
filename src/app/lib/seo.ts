@@ -229,3 +229,49 @@ export function getToolMetadata(slug: string): Metadata {
         },
     };
 }
+
+/**
+ * Generate JSON-LD structured data for a specific tool.
+ * Embeds as a SoftwareApplication with BreadcrumbList for Google rich results.
+ */
+export function getToolJsonLd(slug: string) {
+    const tool = TOOL_SEO[slug];
+    if (!tool) return null;
+
+    return [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: tool.title.split('—')[0]?.trim() || tool.title,
+            url: `${DOMAIN}${tool.path}`,
+            description: tool.description,
+            applicationCategory: 'UtilityApplication',
+            operatingSystem: 'All',
+            offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+            },
+            isAccessibleForFree: true,
+            browserRequirements: 'Requires a modern browser with JavaScript enabled',
+        },
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'TouchPDF',
+                    item: DOMAIN,
+                },
+                {
+                    '@type': 'ListItem',
+                    position: 2,
+                    name: tool.title.split('—')[0]?.trim() || tool.title,
+                    item: `${DOMAIN}${tool.path}`,
+                },
+            ],
+        },
+    ];
+}
