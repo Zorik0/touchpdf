@@ -46,6 +46,12 @@ const TOOL_SEO: Record<string, ToolSEO> = {
         keywords: ['organize pdf', 'reorder pdf pages', 'delete pdf page', 'rearrange pdf', 'pdf page manager'],
         path: '/organize',
     },
+    'view-pdf': {
+        title: 'PDF Viewer — Read PDF Files Online Free',
+        description: 'Open and read any PDF in your browser. No uploads, no accounts. Remembers your last page so you can pick up where you left off.',
+        keywords: ['pdf viewer', 'read pdf online', 'open pdf browser', 'pdf reader free', 'view pdf file'],
+        path: '/view-pdf',
+    },
     'extract-text': {
         title: 'PDF to Text — Extract Text from PDF Online Free',
         description: 'Extract raw text content from any PDF document. Copy to clipboard instantly. No file uploads.',
