@@ -40,6 +40,7 @@ import {
   FileUser,
   Receipt,
   Award,
+  BookOpen,
 } from 'lucide-react';
 import styles from './Home.module.css';
 import Logo from './components/Logo';
@@ -53,6 +54,7 @@ import VisualProof from './components/VisualProof';
 // Grouped by categories as per the new "Feature-First" design
 const ALL_TOOLS = [
   // Edit & Annotate
+  { href: '/view-pdf',     type: 'pdf',   icon: BookOpen,      title: 'PDF Viewer',       desc: 'Read PDFs, resume where left off', cat: 'Edit & Annotate', keywords: 'view read open pdf viewer reader' },
   { href: '/extract-text', type: 'pdf',   icon: Type,          title: 'Edit Text',        desc: 'Edit PDF text directly', cat: 'Edit & Annotate', keywords: 'edit text modify content' },
   { href: '/annotate',     type: 'pdf',   icon: Highlighter,   title: 'Annotate PDF',     desc: 'Draw, highlight, sign',  cat: 'Edit & Annotate', keywords: 'annotate draw highlight sign', badge: 'New' },
   { href: '/redact',       type: 'pdf',   icon: Eraser,        title: 'Redact PDF',       desc: 'Permanently hide info',  cat: 'Edit & Annotate', keywords: 'redact hide remove text', badge: 'Privacy' },
