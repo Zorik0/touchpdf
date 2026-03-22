@@ -1,0 +1,183 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 80px;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  align-self: flex-start;
+  max-width: 900px;
+  width: 100%;
+}
+
+/* ── Drop Zone ── */
+.dropzone {
+  width: 100%;
+  max-width: 520px;
+  margin-top: 60px;
+  border: 2px dashed var(--glass-border);
+  border-radius: var(--radius);
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.dropzone:hover,
+.dragging {
+  border-color: var(--accent-1);
+  color: var(--accent-2);
+  background: rgba(232, 115, 74, 0.04);
+}
+
+.dropzone p {
+  font-size: 0.95rem;
+}
+
+/* ── Viewer ── */
+.viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition), background var(--transition);
+}
+
+.btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--glass-bg);
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.pageInput {
+  width: 48px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 3px 6px;
+  outline: none;
+}
+
+.pageInput:focus {
+  border-color: var(--accent-1);
+}
+
+/* Hide number input spinners */
+.pageInput::-webkit-outer-spin-button,
+.pageInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.pageInput[type=number] {
+  -moz-appearance: textfield;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zoomLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ── Canvas ── */
+.canvasWrap {
+  position: relative;
+  max-width: 100%;
+  overflow: auto;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+}
+
+.canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Loading ── */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 8, 12, 0.6);
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--accent-1);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
