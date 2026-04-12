@@ -34,22 +34,25 @@ export default function PdfToPngPage() {
   const { addToast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Track all created blob URLs to revoke them precisely.
+  const blobUrlsRef = useRef<string[]>([]);
+
+  // Revoke all tracked URLs only on unmount.
+  useEffect(() => {
+    return () => {
+      blobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+      blobUrlsRef.current = [];
+    };
+  }, []);
 
   const handleFile = useCallback(async (f: File) => {
     if (f.type !== 'application/pdf') return;
     setFile(f);
     setImages([]);
-    
+
     // Auto-start processing
     setTimeout(() => processPdf(f), 100);
   }, []);
-
-  // Cleanup URLs on unmount
-  useEffect(() => {
-    return () => {
-      images.forEach(img => URL.revokeObjectURL(img.dataUrl));
-    };
-  }, [images]);
 
   const processPdf = async (f: File) => {
     setProcessing(true);
@@ -77,11 +80,12 @@ export default function PdfToPngPage() {
 
         if (ctx) {
            await page.render({ canvasContext: ctx, viewport } as any).promise;
-           
+
            // Convert to blob
            const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
            if (blob) {
              const dataUrl = URL.createObjectURL(blob);
+             blobUrlsRef.current.push(dataUrl);
              newImages.push({
                pageNum: i,
                dataUrl,
@@ -132,11 +136,11 @@ export default function PdfToPngPage() {
   };
 
   const reset = () => {
+    blobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    blobUrlsRef.current = [];
     setFile(null);
     setImages([]);
     setProgress(0);
-    // Cleanup URLs
-    images.forEach(img => URL.revokeObjectURL(img.dataUrl));
   };
 
   const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragActive(true); };

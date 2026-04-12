@@ -33,22 +33,26 @@ export default function OrganizePage() {
   const { addToast } = useToast();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Track all created blob URLs so we can revoke them precisely.
+  // Using a ref (not state) avoids re-render loops.
+  const blobUrlsRef = useRef<string[]>([]);
+
+  // Revoke all tracked URLs only when the component unmounts.
+  useEffect(() => {
+    return () => {
+      blobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+      blobUrlsRef.current = [];
+    };
+  }, []);
 
   const handleFile = useCallback(async (f: File) => {
     if (f.type !== 'application/pdf') return;
     setFile(f);
     setPages([]);
-    
+
     // Auto-start processing
     setTimeout(() => loadPdf(f), 100);
   }, []);
-
-  // Cleanup object URLs on unmount
-  useEffect(() => {
-    return () => {
-      pages.forEach(p => URL.revokeObjectURL(p.thumbnailUrl));
-    };
-  }, [pages]);
 
   const loadPdf = async (f: File) => {
     setProcessing(true);
@@ -77,10 +81,12 @@ export default function OrganizePage() {
            await page.render({ canvasContext: ctx, viewport } as any).promise;
            const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.8));
            if (blob) {
+             const thumbnailUrl = URL.createObjectURL(blob);
+             blobUrlsRef.current.push(thumbnailUrl);
              newPages.push({
                id: Math.random().toString(36).substring(7),
                originalIndex: i - 1,
-               thumbnailUrl: URL.createObjectURL(blob)
+               thumbnailUrl,
              });
            }
         }
@@ -109,7 +115,10 @@ export default function OrganizePage() {
 
   const deletePage = (id: string) => {
     const page = pages.find(p => p.id === id);
-    if (page) URL.revokeObjectURL(page.thumbnailUrl);
+    if (page) {
+      URL.revokeObjectURL(page.thumbnailUrl);
+      blobUrlsRef.current = blobUrlsRef.current.filter(u => u !== page.thumbnailUrl);
+    }
     setPages(prev => prev.filter(p => p.id !== id));
   };
 
@@ -152,6 +161,8 @@ export default function OrganizePage() {
   };
 
   const reset = () => {
+    blobUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    blobUrlsRef.current = [];
     setFile(null);
     setPages([]);
     setOriginalPdfBytes(null);
