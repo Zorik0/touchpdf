@@ -150,6 +150,13 @@ export default function PrintAssistorPage() {
   // Generation
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Track images in a ref so the unmount cleanup can access the latest value
+  const imagesRef = useRef<UploadedImage[]>([]);
+  useEffect(() => { imagesRef.current = images; }, [images]);
+  useEffect(() => {
+    return () => { imagesRef.current.forEach(img => URL.revokeObjectURL(img.url)); };
+  }, []);
+
   const { addToast } = useToast();
 
   const paper = PAPER_SIZES[paperIndex];
