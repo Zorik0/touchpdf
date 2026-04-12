@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import { 
   FileStack, 
@@ -31,6 +31,13 @@ export default function PngToPdfPage() {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+
+  // Revoke all preview URLs on unmount to avoid memory leaks.
+  useEffect(() => {
+    return () => {
+      items.forEach(item => URL.revokeObjectURL(item.previewUrl));
+    };
+  }, [items]);
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { ImageDown, Upload, Download, Loader2, X } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
@@ -14,6 +14,13 @@ export default function ImageCompressorPage() {
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+
+  // Revoke all result blob URLs when they change or on unmount.
+  useEffect(() => {
+    return () => {
+      results.forEach(r => URL.revokeObjectURL(r.url));
+    };
+  }, [results]);
 
   const addFiles = (fl: FileList | null) => {
     if (!fl) return;
@@ -83,7 +90,7 @@ export default function ImageCompressorPage() {
           <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius)', padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <strong>{files.length} image(s) selected</strong>
-              <button onClick={() => { setFiles([]); setResults([]); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={16} /></button>
+              <button onClick={() => { results.forEach(r => URL.revokeObjectURL(r.url)); setFiles([]); setResults([]); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={16} /></button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>

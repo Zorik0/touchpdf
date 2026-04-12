@@ -1,7 +1,5 @@
 'use client';
 
-import { useToast } from '../components/ui/Toast';
-
 export default function AnnotatePage() {
   return (
     <div className="page-container">

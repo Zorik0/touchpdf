@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import { useToast } from '../components/ui/Toast';
-import { Lock, Upload, FileText, Download, Loader2, ListRestart, Eye, EyeOff } from 'lucide-react';
+import { Lock, Upload, FileText, Download, Loader2, ListRestart, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 
 export default function ProtectPdfPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -27,19 +27,15 @@ export default function ProtectPdfPage() {
       const ab = await file.arrayBuffer();
       const pdf = await PDFDocument.load(ab, { ignoreEncryption: true });
 
-      // pdf-lib doesn't support encryption natively.
-      // We'll use the web crypto API to create a basic security layer
-      // by embedding the password requirement metadata.
-      // For true encryption, we'd need a different library.
-      
-      // For now: strip metadata and re-save (placeholder for real encryption)
-      // The real approach: use pdf-lib to set permissions
-      pdf.setTitle(`Protected - ${file.name}`);
+      // NOTE: pdf-lib does not support AES/RC4 PDF encryption.
+      // We embed the password as a metadata keyword so the intent is
+      // preserved, but this does NOT prevent the file from being opened
+      // without a password in a standard PDF viewer.
+      pdf.setTitle(file.name.replace('.pdf', ''));
+      pdf.setKeywords([`password-hint:${password}`]);
       pdf.setProducer('TouchPDF');
-      
+
       const bytes = await pdf.save();
-      
-      // Simple XOR encryption wrapper (basic protection)
       const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -47,9 +43,11 @@ export default function ProtectPdfPage() {
       a.download = `${file.name.replace('.pdf', '')}_protected.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) { 
-      console.error(err); 
-      addToast('Error protecting PDF', 'error'); 
+
+      addToast('Downloaded — see the important notice above.', 'info');
+    } catch (err) {
+      console.error(err);
+      addToast('Error processing PDF', 'error');
     }
     finally { setIsProcessing(false); }
   };
@@ -65,7 +63,14 @@ export default function ProtectPdfPage() {
         <div className="section-header">
           <div className="section-badge"><Lock size={14} /> Protect</div>
           <h1 className="section-title">Protect <span className="gradient-text">PDF</span></h1>
-          <p className="section-subtitle">Add password protection to your PDF. Secure your documents before sharing.</p>
+          <p className="section-subtitle">Add a password hint to your PDF document.</p>
+        </div>
+
+        <div style={{ maxWidth: 520, margin: '0 auto 24px', background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.4)', borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <AlertTriangle size={18} style={{ color: '#eab308', flexShrink: 0, marginTop: 2 }} />
+          <div style={{ fontSize: '0.85rem', lineHeight: 1.5 }}>
+            <strong style={{ color: '#eab308' }}>Limited protection:</strong> The pdf-lib library used here does not support AES/RC4 PDF encryption. The downloaded file will <em>not</em> require a password to open in standard PDF viewers. For real password protection use Adobe Acrobat, LibreOffice, or a dedicated encryption tool.
+          </div>
         </div>
 
         {!file ? (
@@ -103,7 +108,7 @@ export default function ProtectPdfPage() {
 
               <button className="btn btn-primary" onClick={protectPdf} disabled={isProcessing || !password}
                 style={{ width: '100%', justifyContent: 'center', padding: 14 }}>
-                {isProcessing ? <><Loader2 className="spinner" /> Protecting...</> : <><Lock size={18} /> Protect & Download</>}
+                {isProcessing ? <><Loader2 className="spinner" /> Processing...</> : <><Lock size={18} /> Add Hint & Download</>}
               </button>
             </div>
           </div>
