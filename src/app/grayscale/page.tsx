@@ -32,7 +32,7 @@ export default function GrayscalePage() {
         canvas.width = vp.width;
         canvas.height = vp.height;
         const ctx = canvas.getContext('2d')!;
-        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+        await page.render({ canvasContext: ctx, viewport: vp } as any).promise;
 
         // Convert to grayscale
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);

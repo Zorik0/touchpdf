@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import jsQR from 'jsqr';
 import { QrCode, Download, Copy, Check, Upload, ScanLine } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
@@ -19,6 +19,13 @@ export default function QrCodePage() {
   const [isScanning, setIsScanning] = useState(false);
   const scanInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
+
+  // Revoke the upload preview URL when it changes or on unmount.
+  useEffect(() => {
+    return () => {
+      if (uploadPreview) URL.revokeObjectURL(uploadPreview);
+    };
+  }, [uploadPreview]);
 
   const qrUrl = text.length > 0
     ? `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&color=${fgColor.replace('#', '')}&bgcolor=${bgColor.replace('#', '')}`
@@ -61,14 +68,16 @@ export default function QrCodePage() {
       return;
     }
     setIsScanning(true);
-    setUploadPreview(URL.createObjectURL(file));
+    // Create a single URL and reuse it for both the preview and the image decoder.
+    const previewUrl = URL.createObjectURL(file);
+    setUploadPreview(previewUrl);
 
     try {
       const imgEl = document.createElement('img');
       const loadPromise = new Promise<void>((resolve) => {
         imgEl.onload = () => resolve();
       });
-      imgEl.src = URL.createObjectURL(file);
+      imgEl.src = previewUrl; // reuse — no second URL needed
       await loadPromise;
 
       const canvas = document.createElement('canvas');
