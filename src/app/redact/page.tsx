@@ -95,12 +95,14 @@ export default function RedactPage() {
         
         // Download
         const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = blobUrl;
         link.download = `redacted-${file.name}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
 
     } catch (err) {
         console.error("Redaction failed", err);

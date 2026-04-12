@@ -41,21 +41,33 @@ export default function PdfSignPage() {
     ctx.lineJoin = 'round';
   }, []);
 
+  // Returns canvas coordinates scaled from client/touch position.
+  const getCanvasPos = (clientX: number, clientY: number) => {
+    const canvas = sigCanvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  };
+
   const startDraw = (e: React.MouseEvent) => {
     isDrawingRef.current = true;
     const ctx = sigCanvasRef.current?.getContext('2d');
     if (!ctx) return;
-    const rect = sigCanvasRef.current!.getBoundingClientRect();
+    const { x, y } = getCanvasPos(e.clientX, e.clientY);
     ctx.beginPath();
-    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.moveTo(x, y);
   };
 
   const draw = (e: React.MouseEvent) => {
     if (!isDrawingRef.current) return;
     const ctx = sigCanvasRef.current?.getContext('2d');
     if (!ctx) return;
-    const rect = sigCanvasRef.current!.getBoundingClientRect();
-    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    const { x, y } = getCanvasPos(e.clientX, e.clientY);
+    ctx.lineTo(x, y);
     ctx.stroke();
   };
 
@@ -64,6 +76,32 @@ export default function PdfSignPage() {
     if (sigCanvasRef.current) {
       setSigDataUrl(sigCanvasRef.current.toDataURL('image/png'));
     }
+  };
+
+  // Touch equivalents for mobile signature drawing.
+  const startDrawTouch = (e: React.TouchEvent) => {
+    e.preventDefault();
+    isDrawingRef.current = true;
+    const ctx = sigCanvasRef.current?.getContext('2d');
+    if (!ctx || e.touches.length === 0) return;
+    const { x, y } = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const drawTouch = (e: React.TouchEvent) => {
+    e.preventDefault();
+    if (!isDrawingRef.current) return;
+    const ctx = sigCanvasRef.current?.getContext('2d');
+    if (!ctx || e.touches.length === 0) return;
+    const { x, y } = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const endDrawTouch = (e: React.TouchEvent) => {
+    e.preventDefault();
+    endDraw();
   };
 
   const clearSig = () => {
@@ -152,11 +190,14 @@ export default function PdfSignPage() {
             <>
               <canvas
                 ref={sigCanvasRef}
-                style={{ width: '100%', maxWidth: 400, height: 150, borderRadius: 8, border: '1px solid var(--glass-border)', cursor: 'crosshair', display: 'block', background: '#fff' }}
+                style={{ width: '100%', maxWidth: 400, height: 150, borderRadius: 8, border: '1px solid var(--glass-border)', cursor: 'crosshair', display: 'block', background: '#fff', touchAction: 'none' }}
                 onMouseDown={startDraw}
                 onMouseMove={draw}
                 onMouseUp={endDraw}
                 onMouseLeave={endDraw}
+                onTouchStart={startDrawTouch}
+                onTouchMove={drawTouch}
+                onTouchEnd={endDrawTouch}
               />
               <button className="btn btn-ghost" onClick={clearSig} style={{ marginTop: 8 }}><Trash2 size={14} /> Clear</button>
             </>
