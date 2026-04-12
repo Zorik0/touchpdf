@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import { useToast } from '../components/ui/Toast';
 import { Minimize2, Upload, FileText, Download, Loader2, ListRestart, Info } from 'lucide-react';
@@ -15,6 +15,13 @@ export default function CompressPdfPage() {
   const [compressedUrl, setCompressedUrl] = useState('');
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Revoke the compressed blob URL when the component unmounts to avoid memory leaks.
+  useEffect(() => {
+    return () => {
+      if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    };
+  }, [compressedUrl]);
 
   const handleFile = useCallback(async (f: File) => {
     if (f.type !== 'application/pdf') return;
