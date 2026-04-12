@@ -2,17 +2,17 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { 
-  FileText, 
-  Image as ImageIcon, 
-  FileCode, 
-  FileSpreadsheet, 
+import {
+  FileText,
+  Image as ImageIcon,
+  FileCode,
+  FileSpreadsheet,
   Presentation,
-  ArrowRightLeft, 
-  Combine, 
-  Scissors, 
-  Minimize2, 
-  ArrowUpFromLine, 
+  ArrowRightLeft,
+  Combine,
+  Scissors,
+  Minimize2,
+  ArrowUpFromLine,
   Type,
   Shield,
   Zap,
@@ -41,24 +41,20 @@ import {
   Receipt,
   Award,
   BookOpen,
+  Sparkles,
+  ChevronRight,
+  ArrowRight,
 } from 'lucide-react';
 import styles from './Home.module.css';
-import Logo from './components/Logo';
-import AdSlot from './components/AdSlot';
-import ToolCard from './components/ToolCard';
-import FeatureGrid from './components/FeatureGrid';
-import TrustBar from './components/TrustBar';
-import VisualProof from './components/VisualProof';
 
 // ── Tool Definitions ──
-// Grouped by categories as per the new "Feature-First" design
 const ALL_TOOLS = [
   // Edit & Annotate
   { href: '/view-pdf',     type: 'pdf',   icon: BookOpen,      title: 'PDF Viewer',       desc: 'Read PDFs, resume where left off', cat: 'Edit & Annotate', keywords: 'view read open pdf viewer reader' },
   { href: '/extract-text', type: 'pdf',   icon: Type,          title: 'Edit Text',        desc: 'Edit PDF text directly', cat: 'Edit & Annotate', keywords: 'edit text modify content' },
   { href: '/annotate',     type: 'pdf',   icon: Highlighter,   title: 'Annotate PDF',     desc: 'Draw, highlight, sign',  cat: 'Edit & Annotate', keywords: 'annotate draw highlight sign', badge: 'New' },
   { href: '/redact',       type: 'pdf',   icon: Eraser,        title: 'Redact PDF',       desc: 'Permanently hide info',  cat: 'Edit & Annotate', keywords: 'redact hide remove text', badge: 'Privacy' },
-  
+
   // Organize & Manage
   { href: '/merge-pdf',    type: 'pdf',   icon: Combine,       title: 'Merge PDF',        desc: 'Combine multiple files', cat: 'Organize & Manage', keywords: 'merge combine join append' },
   { href: '/split-pdf',    type: 'pdf',   icon: Scissors,      title: 'Split PDF',        desc: 'Extract or split pages', cat: 'Organize & Manage', keywords: 'split separate extract' },
@@ -70,17 +66,17 @@ const ALL_TOOLS = [
   { href: '/pdf-to-excel', type: 'excel', icon: Table,         title: 'PDF to Excel',     desc: 'Extract tables to XLSX', cat: 'Convert & Export', keywords: 'excel xlsx table spreadsheet', badge: 'New' },
   { href: '/pdf-to-png',   type: 'image', icon: ImageIcon,     title: 'PDF to JPG/PNG',   desc: 'Save pages as images',   cat: 'Convert & Export', keywords: 'jpg png image photo' },
   { href: '/png-to-pdf',   type: 'image', icon: ImageIcon,     title: 'JPG to PDF',       desc: 'Convert images to PDF',  cat: 'Convert & Export', keywords: 'jpg png image photo' },
-  { href: '/print-assistor', type: 'image', icon: Printer,    title: 'Print Assistor',   desc: 'Passport & ID photo prep', cat: 'Convert & Export', keywords: 'print passport visa photo size id card wallet', badge: 'New' },
+  { href: '/print-assistor', type: 'image', icon: Printer,     title: 'Print Assistor',   desc: 'Passport & ID photo prep', cat: 'Convert & Export', keywords: 'print passport visa photo size id card wallet', badge: 'New' },
   { href: '/word-to-pdf',  type: 'word',  icon: FileText,      title: 'Word to PDF',      desc: 'Docx to PDF',            cat: 'Convert & Export', keywords: 'word docx' },
   { href: '/ppt-to-pdf',   type: 'ppt',   icon: Presentation,  title: 'PPT to PDF',       desc: 'PowerPoint to PDF',      cat: 'Convert & Export', keywords: 'ppt pptx powerpoint' },
-  
+
   // Security & Privacy
   { href: '/protect-pdf',  type: 'pdf',   icon: Lock,          title: 'Protect PDF',      desc: 'Encrypt with password',  cat: 'Security & Privacy', keywords: 'protect lock password encrypt' },
   { href: '/unlock-pdf',   type: 'pdf',   icon: Lock,          title: 'Unlock PDF',       desc: 'Remove passwords',       cat: 'Security & Privacy', keywords: 'unlock remove password decrypt' },
   { href: '/watermark-pdf', type: 'pdf',  icon: Droplets,      title: 'Watermark',        desc: 'Add stamp or text',      cat: 'Security & Privacy', keywords: 'watermark stamp overlay' },
   { href: '/privacy-clean', type: 'pdf',  icon: EyeOff,        title: 'Privacy Cleaner',  desc: 'Remove metadata',        cat: 'Security & Privacy', keywords: 'metadata hidden clean', badge: 'Privacy' },
 
-  // Batch Tools & Others
+  // Batch Tools
   { href: '/compress-pdf', type: 'pdf',   icon: Minimize2,     title: 'Compress PDF',     desc: 'Reduce file size',       cat: 'Batch Tools', keywords: 'compress shrink optimize' },
   { href: '/batch-convert', type: 'pdf',  icon: FileStack,     title: 'Batch Convert',    desc: 'Process multiple files', cat: 'Batch Tools', keywords: 'batch bulk convert', badge: 'Pro' },
   { href: '/invert',       type: 'pdf',   icon: ArrowRightLeft, title: 'Invert Colors',   desc: 'Dark mode for PDFs',     cat: 'Batch Tools', keywords: 'invert dark mode color' },
@@ -106,7 +102,9 @@ const ALL_TOOLS = [
   { href: '/resume-builder', type: 'other', icon: FileUser,    title: 'Resume Builder',   desc: 'Create resume PDF',      cat: 'Generators', keywords: 'resume cv builder create', badge: 'New' },
   { href: '/invoice-generator', type: 'other', icon: Receipt,  title: 'Invoice Generator', desc: 'Create invoices',       cat: 'Generators', keywords: 'invoice bill receipt generator' },
   { href: '/certificate-generator', type: 'other', icon: Award, title: 'Certificate',     desc: 'Generate certificates',  cat: 'Generators', keywords: 'certificate award achievement' },
-];
+] as const;
+
+type Tool = (typeof ALL_TOOLS)[number] & { badge?: string };
 
 const CATEGORIES = [
   'Edit & Annotate',
@@ -120,117 +118,171 @@ const CATEGORIES = [
   'Generators',
 ];
 
+const FEATURED_HREFS = ['/merge-pdf', '/sign-pdf', '/compress-pdf', '/pdf-to-png'];
+const FEATURED = FEATURED_HREFS
+  .map(href => ALL_TOOLS.find(t => t.href === href))
+  .filter(Boolean) as Tool[];
+
 export default function HomePage() {
   const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('All');
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return null;
-    const q = query.toLowerCase();
-    return ALL_TOOLS.filter(t =>
-      t.title.toLowerCase().includes(q) ||
-      t.desc.toLowerCase().includes(q) ||
-      t.keywords.includes(q)
-    );
-  }, [query]);
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      return (ALL_TOOLS as unknown as Tool[]).filter(t =>
+        t.title.toLowerCase().includes(q) ||
+        t.desc.toLowerCase().includes(q) ||
+        t.keywords.includes(q)
+      );
+    }
+    if (activeTab === 'All') return ALL_TOOLS as unknown as Tool[];
+    return (ALL_TOOLS as unknown as Tool[]).filter(t => t.cat === activeTab);
+  }, [query, activeTab]);
 
-  // Grouped logic is now handled in FeatureGrid, but we might need it for filtered view if we want to show category
-  // For now, filtered view is just a flat grid as per original design, which is fine.
+  const isSearching = query.trim().length > 0;
 
   return (
-    <div className="page-container">
+    <div className={styles.page}>
+
+      {/* ── Hero ── */}
       <section className={styles.hero}>
-        
-        {/* Logo */}
-        <div className="animate-in" style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
-          <Logo size={64} />
+        <div className={styles.heroGlow} />
+        <div className={styles.heroContent}>
+
+          <div className={styles.heroPill}>
+            <Sparkles size={12} />
+            40+ free tools · No sign-up required
+          </div>
+
+          <h1 className={styles.heroTitle}>
+            Every PDF tool<br />
+            <span className={styles.heroAccent}>you&apos;ll ever need.</span>
+          </h1>
+
+          <p className={styles.heroSubtitle}>
+            Merge, split, compress, convert, sign, and more.
+            Everything runs in your browser — your files never leave your device.
+          </p>
+
+          <div className={styles.searchWrap}>
+            <Search size={18} className={styles.searchIcon} />
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search 40+ tools... e.g. merge, compress, sign"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+            />
+            {query && (
+              <button className={styles.searchClear} onClick={() => setQuery('')} aria-label="Clear search">
+                <X size={15} />
+              </button>
+            )}
+          </div>
+
+          <div className={styles.trustRow}>
+            <span className={styles.trustItem}><Shield size={13} /> Privacy first</span>
+            <span className={styles.trustDot} />
+            <span className={styles.trustItem}><Zap size={13} /> Instant results</span>
+            <span className={styles.trustDot} />
+            <span className={styles.trustItem}><CloudOff size={13} /> No uploads</span>
+            <span className={styles.trustDot} />
+            <span className={styles.trustItem}><Sparkles size={13} /> Always free</span>
+          </div>
+
         </div>
+      </section>
 
-        {/* Headline */}
-        <h1 className={`${styles.heroTitle} animate-in animate-delay-1`}>
-          Edit, Organize & Secure PDFs<br />
-          <span className="gradient-text">100% In Your Browser.</span>
-        </h1>
+      {/* ── Featured Tools ── */}
+      {!isSearching && (
+        <section className={styles.featuredSection}>
+          <div className={styles.wrapper}>
+            <p className={styles.sectionLabel}>Most popular</p>
+            <div className={styles.featuredGrid}>
+              {FEATURED.map(tool => (
+                <Link href={tool.href} key={tool.href} className={styles.featuredCard}>
+                  <div className={styles.featuredIconWrap} data-type={tool.type}>
+                    <tool.icon size={22} />
+                  </div>
+                  <div className={styles.featuredInfo}>
+                    <div className={styles.featuredTitle}>{tool.title}</div>
+                    <div className={styles.featuredDesc}>{tool.desc}</div>
+                  </div>
+                  <ChevronRight size={16} className={styles.featuredArrow} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-        <p className={`${styles.heroSubtitle} animate-in animate-delay-2`}>
-          The privacy-first PDF tool. No uploads, no sign-ups, no watermarks.<br />
-          Just powerful tools that run entirely on your device.
-        </p>
+      {/* ── All Tools ── */}
+      <section className={styles.toolsSection}>
+        <div className={styles.wrapper}>
 
-        {/* Search */}
-        <div className={`${styles.searchWrapper} animate-in animate-delay-3`}>
-          <Search size={20} className={styles.searchIcon} />
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="What do you want to do? e.g. merge, redact, convert..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
-          {query && (
-            <button className={styles.searchClear} onClick={() => setQuery('')}>
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        {/* Feature Badges */}
-        <div className={`${styles.featureBadges} animate-in animate-delay-3`}>
-          {ALL_TOOLS.map(t => (
-            <Link key={t.href} href={t.href} className={styles.featureBadge}>
-              <t.icon size={12} />
-              {t.title}
-            </Link>
-          ))}
-        </div>
-
-        {/* Trust Bar */}
-        <div className="animate-in animate-delay-3">
-          <TrustBar />
-        </div>
-
-        {/* Visual Proof — hidden on mobile */}
-        <div className={`${styles.visualProofWrap} animate-in animate-delay-3`}>
-           <VisualProof />
-        </div>
-
-        {/* Ad Banner Top */}
-        <AdSlot slot="1234567890" format="horizontal" className={styles.adBanner} />
-
-        {/* ── Content Area ── */}
-        <div className="animate-in animate-delay-4">
-          
-          {filtered !== null ? (
-            /* Search Results */
-            <div className={styles.featureGridContainer}>
-              <div className={styles.gridHeader} style={{ marginBottom: 32, textAlign: 'left' }}>
-                 <h3 className={styles.sectionTitle} style={{ fontSize: '1.5rem' }}>
-                   {filtered.length} result{filtered.length !== 1 ? 's' : ''} for "{query}"
-                 </h3>
+          <div className={styles.toolsHeader}>
+            <h2 className={styles.toolsTitle}>
+              {isSearching
+                ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''} for "${query}"`
+                : 'All Tools'}
+            </h2>
+            {!isSearching && (
+              <div className={styles.tabsScroll}>
+                <div className={styles.tabs}>
+                  {['All', ...CATEGORIES].map(cat => (
+                    <button
+                      key={cat}
+                      className={`${styles.tab} ${activeTab === cat ? styles.tabActive : ''}`}
+                      onClick={() => setActiveTab(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
-              
-              {filtered.length > 0 ? (
-                <div className={styles.toolGrid}>
-                  {filtered.map(t => <ToolCard key={t.href} tool={t} />)}
-                </div>
-              ) : (
-                <div className={styles.emptySearch}>
-                  No tools found. Try "merge", "compress", or "edit".
-                </div>
-              )}
+            )}
+          </div>
+
+          {filtered.length > 0 ? (
+            <div className={styles.toolGrid}>
+              {filtered.map(tool => (
+                <Link href={tool.href} key={tool.href} className={styles.toolCard} data-type={tool.type}>
+                  <div className={styles.toolIcon}>
+                    <tool.icon size={18} />
+                  </div>
+                  <div className={styles.toolBody}>
+                    <span className={styles.toolName}>{tool.title}</span>
+                    <span className={styles.toolDesc}>{tool.desc}</span>
+                  </div>
+                  {'badge' in tool && tool.badge && (
+                    <span className={styles.badge}>{tool.badge}</span>
+                  )}
+                  <ArrowRight size={14} className={styles.toolArrow} />
+                </Link>
+              ))}
             </div>
           ) : (
-            /* Main Feature Grid */
-            <>
-                <FeatureGrid tools={ALL_TOOLS} categories={CATEGORIES} />
-            </>
+            <p className={styles.empty}>
+              No tools found for &quot;{query}&quot;. Try &ldquo;merge&rdquo;, &ldquo;sign&rdquo;, or &ldquo;compress&rdquo;.
+            </p>
           )}
 
         </div>
-
-        {/* Ad Banner Bottom */}
-        <AdSlot slot="3456789012" format="horizontal" className={styles.adBanner} />
-
       </section>
+
+      {/* ── Footer CTA ── */}
+      <section className={styles.footerCta}>
+        <div className={styles.footerCtaInner}>
+          <p className={styles.footerCtaTitle}>
+            All tools are <span className={styles.heroAccent}>free, forever.</span>
+          </p>
+          <p className={styles.footerCtaSub}>
+            No account. No file size limit. No watermarks. Built for privacy.
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 }
