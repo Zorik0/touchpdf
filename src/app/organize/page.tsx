@@ -58,7 +58,9 @@ export default function OrganizePage() {
     setProcessing(true);
     try {
       const arrayBuffer = await f.arrayBuffer();
-      setOriginalPdfBytes(arrayBuffer); // Store for later saving
+      // Keep our own copy: pdf.js transfers the buffer it receives to its
+      // worker, which detaches it and would break savePdf later.
+      setOriginalPdfBytes(arrayBuffer.slice(0));
 
       const pdfjs = await initPdfWorker();
       const loadingTask = pdfjs.getDocument(arrayBuffer);
@@ -148,7 +150,7 @@ export default function OrganizePage() {
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = `organized_${file?.name || 'document'}.pdf`;
+      a.download = `organized_${(file?.name || 'document').replace(/\.pdf$/i, '')}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
       

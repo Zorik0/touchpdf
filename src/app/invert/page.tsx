@@ -44,67 +44,76 @@ export default function InvertPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
   const invertedCanvasRef = useRef<HTMLCanvasElement>(null);
+  // pdf.js allows only one render() per canvas at a time, so renders are
+  // serialized per canvas and superseded requests are dropped.
+  const renderChainsRef = useRef(new WeakMap<HTMLCanvasElement, Promise<void>>());
+  const renderSeqRef = useRef(new WeakMap<HTMLCanvasElement, number>());
 
   const selectedItem = items.find(i => i.id === selectedItemId) || items[0] || null;
 
-  // Render a page from a PDF (blob URL) onto a canvas
-  const renderPage = useCallback(async (url: string, canvas: HTMLCanvasElement, pageNum: number) => {
-    try {
+  // Render a page from PDF bytes onto a canvas.
+  // We pass raw bytes (not a blob URL) because pdf.js's URL transport
+  // fails on blob: URLs, and revoking a URL mid-render breaks the preview.
+  const renderPage = useCallback((data: ArrayBuffer | Uint8Array, canvas: HTMLCanvasElement, pageNum: number) => {
+    const seq = (renderSeqRef.current.get(canvas) || 0) + 1;
+    renderSeqRef.current.set(canvas, seq);
+
+    const prev = renderChainsRef.current.get(canvas) || Promise.resolve();
+    const next = prev.then(async () => {
+      // A newer request for this canvas arrived while we were queued
+      if (renderSeqRef.current.get(canvas) !== seq) return;
+
       const pdfjs = await initPdfWorker();
-      const loadingTask = pdfjs.getDocument(url);
-      const pdf = await loadingTask.promise;
-      
+      // Copy the bytes: pdf.js transfers the buffer to its worker (detaching it),
+      // and callers keep their copies for downloads.
+      const bytes = data instanceof Uint8Array ? new Uint8Array(data) : new Uint8Array(data.slice(0));
+      const pdf = await pdfjs.getDocument({ data: bytes }).promise;
+
       // Handle out of bounds
       if (pageNum >= pdf.numPages) pageNum = 0;
-      
+
       const page = await pdf.getPage(pageNum + 1);
-      const scale = 1.0; 
-      // Adjust scale based on canvas container width if needed, but 1.0 or 1.5 is standard
       const viewport = page.getViewport({ scale: 1.5 });
 
-      // Check if canvas is still valid in DOM
-      if (!canvas) return;
+      if (renderSeqRef.current.get(canvas) !== seq) return;
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      
+
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Clear previous render
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport,
-        };
-        await page.render(renderContext as any).promise;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await page.render({ canvasContext: ctx, viewport } as any).promise;
       }
-    } catch (err) {
-      console.error('Error rendering page:', err);
-    }
+    }).catch(err => {
+      if ((err as Error)?.name !== 'RenderingCancelledException') {
+        console.error('Error rendering page:', err);
+      }
+    });
+
+    renderChainsRef.current.set(canvas, next);
+    return next;
   }, []);
 
   // Effect to render previews when selected item changes
   useEffect(() => {
     if (!selectedItem) return;
+    let cancelled = false;
 
-    // Create URL for original file if not exists (we don't store it to save memory, create on fly?)
-    // Actually better to create it once. Let's assume we create it when needed.
-    const originalUrl = URL.createObjectURL(selectedItem.file);
-    
-    if (originalCanvasRef.current) {
-      renderPage(originalUrl, originalCanvasRef.current, previewPage);
-    }
-    
-    if (selectedItem.invertedUrl && invertedCanvasRef.current) {
-      renderPage(selectedItem.invertedUrl, invertedCanvasRef.current, previewPage);
-    }
-
-    // Cleanup
-    return () => {
-      URL.revokeObjectURL(originalUrl);
+    const renderPreviews = async () => {
+      if (selectedItem.invertedBytes && invertedCanvasRef.current) {
+        renderPage(selectedItem.invertedBytes, invertedCanvasRef.current, previewPage);
+      } else if (originalCanvasRef.current) {
+        const buf = await selectedItem.file.arrayBuffer();
+        if (cancelled || !originalCanvasRef.current) return;
+        renderPage(buf, originalCanvasRef.current, previewPage);
+      }
     };
-  }, [selectedItem, previewPage, renderPage, selectedItem?.invertedUrl]);
+
+    renderPreviews();
+    return () => { cancelled = true; };
+  }, [selectedItem, previewPage, renderPage, selectedItem?.invertedBytes]);
 
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
