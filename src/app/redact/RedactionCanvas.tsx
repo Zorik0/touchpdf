@@ -56,9 +56,13 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
+        // The canvas may be displayed smaller than its internal size
+        // (maxWidth: 100%), so convert CSS pixels to canvas coordinates.
+        const scaleX = rect.width > 0 ? canvas.width / rect.width : 1;
+        const scaleY = rect.height > 0 ? canvas.height / rect.height : 1;
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
         };
     };
 
@@ -100,11 +104,13 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
             ref={canvasRef}
             width={width}
             height={height}
-            style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                zIndex: 10, 
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 10,
                 cursor: 'crosshair',
                 touchAction: 'none'
             }}

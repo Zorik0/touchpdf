@@ -55,8 +55,8 @@ import VisualProof from './components/VisualProof';
 const ALL_TOOLS = [
   // Edit & Annotate
   { href: '/view-pdf',     type: 'pdf',   icon: BookOpen,      title: 'PDF Viewer',       desc: 'Read PDFs, resume where left off', cat: 'Edit & Annotate', keywords: 'view read open pdf viewer reader' },
-  { href: '/extract-text', type: 'pdf',   icon: Type,          title: 'Edit Text',        desc: 'Edit PDF text directly', cat: 'Edit & Annotate', keywords: 'edit text modify content' },
-  { href: '/annotate',     type: 'pdf',   icon: Highlighter,   title: 'Annotate PDF',     desc: 'Draw, highlight, sign',  cat: 'Edit & Annotate', keywords: 'annotate draw highlight sign', badge: 'New' },
+  { href: '/extract-text', type: 'pdf',   icon: Type,          title: 'Extract Text',     desc: 'Copy text from any PDF', cat: 'Edit & Annotate', keywords: 'extract copy text content' },
+  { href: '/annotate',     type: 'pdf',   icon: Highlighter,   title: 'Annotate PDF',     desc: 'Draw, highlight, sign',  cat: 'Edit & Annotate', keywords: 'annotate draw highlight sign', badge: 'Soon' },
   { href: '/redact',       type: 'pdf',   icon: Eraser,        title: 'Redact PDF',       desc: 'Permanently hide info',  cat: 'Edit & Annotate', keywords: 'redact hide remove text', badge: 'Privacy' },
   
   // Organize & Manage
@@ -66,23 +66,23 @@ const ALL_TOOLS = [
   { href: '/rotate-pdf',   type: 'pdf',   icon: RotateCw,      title: 'Rotate PDF',       desc: 'Fix page orientation',   cat: 'Organize & Manage', keywords: 'rotate turn flip' },
 
   // Convert & Export
-  { href: '/pdf-to-word',  type: 'word',  icon: FileText,      title: 'PDF to Word',      desc: 'Convert to Docx',        cat: 'Convert & Export', keywords: 'word docx convert' },
-  { href: '/pdf-to-excel', type: 'excel', icon: Table,         title: 'PDF to Excel',     desc: 'Extract tables to XLSX', cat: 'Convert & Export', keywords: 'excel xlsx table spreadsheet', badge: 'New' },
+  { href: '/pdf-to-word',  type: 'word',  icon: FileText,      title: 'PDF to Word',      desc: 'Convert to Docx',        cat: 'Convert & Export', keywords: 'word docx convert', badge: 'Soon' },
+  { href: '/pdf-to-excel', type: 'excel', icon: Table,         title: 'PDF to Excel',     desc: 'Extract tables to XLSX', cat: 'Convert & Export', keywords: 'excel xlsx table spreadsheet', badge: 'Soon' },
   { href: '/pdf-to-png',   type: 'image', icon: ImageIcon,     title: 'PDF to JPG/PNG',   desc: 'Save pages as images',   cat: 'Convert & Export', keywords: 'jpg png image photo' },
   { href: '/png-to-pdf',   type: 'image', icon: ImageIcon,     title: 'JPG to PDF',       desc: 'Convert images to PDF',  cat: 'Convert & Export', keywords: 'jpg png image photo' },
   { href: '/print-assistor', type: 'image', icon: Printer,    title: 'Print Assistor',   desc: 'Passport & ID photo prep', cat: 'Convert & Export', keywords: 'print passport visa photo size id card wallet', badge: 'New' },
   { href: '/word-to-pdf',  type: 'word',  icon: FileText,      title: 'Word to PDF',      desc: 'Docx to PDF',            cat: 'Convert & Export', keywords: 'word docx' },
-  { href: '/ppt-to-pdf',   type: 'ppt',   icon: Presentation,  title: 'PPT to PDF',       desc: 'PowerPoint to PDF',      cat: 'Convert & Export', keywords: 'ppt pptx powerpoint' },
+  { href: '/ppt-to-pdf',   type: 'ppt',   icon: Presentation,  title: 'PPT to PDF',       desc: 'PowerPoint to PDF',      cat: 'Convert & Export', keywords: 'ppt pptx powerpoint', badge: 'Soon' },
   
   // Security & Privacy
-  { href: '/protect-pdf',  type: 'pdf',   icon: Lock,          title: 'Protect PDF',      desc: 'Encrypt with password',  cat: 'Security & Privacy', keywords: 'protect lock password encrypt' },
+  { href: '/protect-pdf',  type: 'pdf',   icon: Lock,          title: 'Protect PDF',      desc: 'Add a password hint',    cat: 'Security & Privacy', keywords: 'protect lock password encrypt hint' },
   { href: '/unlock-pdf',   type: 'pdf',   icon: Lock,          title: 'Unlock PDF',       desc: 'Remove passwords',       cat: 'Security & Privacy', keywords: 'unlock remove password decrypt' },
   { href: '/watermark-pdf', type: 'pdf',  icon: Droplets,      title: 'Watermark',        desc: 'Add stamp or text',      cat: 'Security & Privacy', keywords: 'watermark stamp overlay' },
   { href: '/privacy-clean', type: 'pdf',  icon: EyeOff,        title: 'Privacy Cleaner',  desc: 'Remove metadata',        cat: 'Security & Privacy', keywords: 'metadata hidden clean', badge: 'Privacy' },
 
   // Batch Tools & Others
   { href: '/compress-pdf', type: 'pdf',   icon: Minimize2,     title: 'Compress PDF',     desc: 'Reduce file size',       cat: 'Batch Tools', keywords: 'compress shrink optimize' },
-  { href: '/batch-convert', type: 'pdf',  icon: FileStack,     title: 'Batch Convert',    desc: 'Process multiple files', cat: 'Batch Tools', keywords: 'batch bulk convert', badge: 'Pro' },
+  { href: '/batch-convert', type: 'pdf',  icon: FileStack,     title: 'Batch Convert',    desc: 'Process multiple files', cat: 'Batch Tools', keywords: 'batch bulk convert', badge: 'Soon' },
   { href: '/invert',       type: 'pdf',   icon: ArrowRightLeft, title: 'Invert Colors',   desc: 'Dark mode for PDFs',     cat: 'Batch Tools', keywords: 'invert dark mode color' },
   { href: '/md-to-pdf',    type: 'html',  icon: FileCode,      title: 'Markdown to PDF',  desc: 'Convert Code/MD',        cat: 'Batch Tools', keywords: 'markdown md code' },
   { href: '/grayscale',    type: 'pdf',   icon: Palette,       title: 'Grayscale PDF',    desc: 'Convert to B&W',         cat: 'Batch Tools', keywords: 'grayscale black white bw' },
