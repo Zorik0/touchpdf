@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { PDFDocument, PDFName, PDFArray, PDFRawStream, PDFRef } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFArray, PDFDict, PDFRef } from 'pdf-lib';
 import JSZip from 'jszip';
 import { 
   ArrowRightLeft, 
@@ -44,67 +44,76 @@ export default function InvertPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalCanvasRef = useRef<HTMLCanvasElement>(null);
   const invertedCanvasRef = useRef<HTMLCanvasElement>(null);
+  // pdf.js allows only one render() per canvas at a time, so renders are
+  // serialized per canvas and superseded requests are dropped.
+  const renderChainsRef = useRef(new WeakMap<HTMLCanvasElement, Promise<void>>());
+  const renderSeqRef = useRef(new WeakMap<HTMLCanvasElement, number>());
 
   const selectedItem = items.find(i => i.id === selectedItemId) || items[0] || null;
 
-  // Render a page from a PDF (blob URL) onto a canvas
-  const renderPage = useCallback(async (url: string, canvas: HTMLCanvasElement, pageNum: number) => {
-    try {
+  // Render a page from PDF bytes onto a canvas.
+  // We pass raw bytes (not a blob URL) because pdf.js's URL transport
+  // fails on blob: URLs, and revoking a URL mid-render breaks the preview.
+  const renderPage = useCallback((data: ArrayBuffer | Uint8Array, canvas: HTMLCanvasElement, pageNum: number) => {
+    const seq = (renderSeqRef.current.get(canvas) || 0) + 1;
+    renderSeqRef.current.set(canvas, seq);
+
+    const prev = renderChainsRef.current.get(canvas) || Promise.resolve();
+    const next = prev.then(async () => {
+      // A newer request for this canvas arrived while we were queued
+      if (renderSeqRef.current.get(canvas) !== seq) return;
+
       const pdfjs = await initPdfWorker();
-      const loadingTask = pdfjs.getDocument(url);
-      const pdf = await loadingTask.promise;
-      
+      // Copy the bytes: pdf.js transfers the buffer to its worker (detaching it),
+      // and callers keep their copies for downloads.
+      const bytes = data instanceof Uint8Array ? new Uint8Array(data) : new Uint8Array(data.slice(0));
+      const pdf = await pdfjs.getDocument({ data: bytes }).promise;
+
       // Handle out of bounds
       if (pageNum >= pdf.numPages) pageNum = 0;
-      
+
       const page = await pdf.getPage(pageNum + 1);
-      const scale = 1.0; 
-      // Adjust scale based on canvas container width if needed, but 1.0 or 1.5 is standard
       const viewport = page.getViewport({ scale: 1.5 });
 
-      // Check if canvas is still valid in DOM
-      if (!canvas) return;
+      if (renderSeqRef.current.get(canvas) !== seq) return;
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      
+
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Clear previous render
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport,
-        };
-        await page.render(renderContext as any).promise;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await page.render({ canvasContext: ctx, viewport } as any).promise;
       }
-    } catch (err) {
-      console.error('Error rendering page:', err);
-    }
+    }).catch(err => {
+      if ((err as Error)?.name !== 'RenderingCancelledException') {
+        console.error('Error rendering page:', err);
+      }
+    });
+
+    renderChainsRef.current.set(canvas, next);
+    return next;
   }, []);
 
   // Effect to render previews when selected item changes
   useEffect(() => {
     if (!selectedItem) return;
+    let cancelled = false;
 
-    // Create URL for original file if not exists (we don't store it to save memory, create on fly?)
-    // Actually better to create it once. Let's assume we create it when needed.
-    const originalUrl = URL.createObjectURL(selectedItem.file);
-    
-    if (originalCanvasRef.current) {
-      renderPage(originalUrl, originalCanvasRef.current, previewPage);
-    }
-    
-    if (selectedItem.invertedUrl && invertedCanvasRef.current) {
-      renderPage(selectedItem.invertedUrl, invertedCanvasRef.current, previewPage);
-    }
-
-    // Cleanup
-    return () => {
-      URL.revokeObjectURL(originalUrl);
+    const renderPreviews = async () => {
+      if (selectedItem.invertedBytes && invertedCanvasRef.current) {
+        renderPage(selectedItem.invertedBytes, invertedCanvasRef.current, previewPage);
+      } else if (originalCanvasRef.current) {
+        const buf = await selectedItem.file.arrayBuffer();
+        if (cancelled || !originalCanvasRef.current) return;
+        renderPage(buf, originalCanvasRef.current, previewPage);
+      }
     };
-  }, [selectedItem, previewPage, renderPage, selectedItem?.invertedUrl]);
+
+    renderPreviews();
+    return () => { cancelled = true; };
+  }, [selectedItem, previewPage, renderPage, selectedItem?.invertedBytes]);
 
 
   const handleFiles = useCallback(async (fileList: FileList | File[]) => {
@@ -160,18 +169,22 @@ export default function InvertPage() {
         const cropBox = page.node.get(PDFName.of('CropBox'));
         let boxArr: number[] = [0, 0, 612, 792]; // fallback A4
 
-        const resolveBox = (box: any): number[] | null => {
+        const numAt = (arr: PDFArray, idx: number, fallback: number): number => {
+          const el = arr.get(idx) as unknown as { numberValue?: number; value?: number } | undefined;
+          return el?.numberValue ?? el?.value ?? fallback;
+        };
+        const resolveBox = (box: unknown): number[] | null => {
           if (!box) return null;
-          let resolved = box;
+          let resolved: unknown = box;
           if (resolved instanceof PDFRef) {
             resolved = pdfDoc.context.lookup(resolved);
           }
           if (resolved instanceof PDFArray) {
             return [
-              (resolved.get(0) as any)?.numberValue ?? (resolved.get(0) as any)?.value ?? 0,
-              (resolved.get(1) as any)?.numberValue ?? (resolved.get(1) as any)?.value ?? 0,
-              (resolved.get(2) as any)?.numberValue ?? (resolved.get(2) as any)?.value ?? 612,
-              (resolved.get(3) as any)?.numberValue ?? (resolved.get(3) as any)?.value ?? 792,
+              numAt(resolved, 0, 0),
+              numAt(resolved, 1, 0),
+              numAt(resolved, 2, 612),
+              numAt(resolved, 3, 792),
             ];
           }
           return null;
@@ -207,16 +220,17 @@ export default function InvertPage() {
         }
 
         const gsName = 'GS_Invert';
-        let extGStateDict = (resourcesObj as any).get(PDFName.of('ExtGState'));
+        const resourcesDict = resourcesObj as PDFDict;
+        let extGStateDict = resourcesDict.get(PDFName.of('ExtGState'));
         if (!extGStateDict) {
           extGStateDict = pdfDoc.context.obj({});
-          (resourcesObj as any).set(PDFName.of('ExtGState'), extGStateDict);
+          resourcesDict.set(PDFName.of('ExtGState'), extGStateDict);
         }
 
         if (extGStateDict instanceof PDFRef) {
-          extGStateDict = pdfDoc.context.lookup(extGStateDict);
+          extGStateDict = pdfDoc.context.lookup(extGStateDict) as PDFDict;
         }
-        (extGStateDict as any).set(PDFName.of(gsName), extGStateRef);
+        (extGStateDict as PDFDict).set(PDFName.of(gsName), extGStateRef);
 
         // 3. Inject inversion rect covering the full page box
         const invertOps = `\nq\n/${gsName} gs\n1 1 1 rg\n${bx} ${by} ${bw} ${bh} re\nf\nQ\n`;

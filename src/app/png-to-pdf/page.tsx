@@ -102,8 +102,8 @@ export default function PngToPdfPage() {
         const availableWidth = pageWidth - (margin * 2);
         const availableHeight = pageHeight - (margin * 2);
         
-        let w = item.width;
-        let h = item.height;
+        const w = item.width;
+        const h = item.height;
         
         // Scale down if needed
         const scale = Math.min(availableWidth / w, availableHeight / h, 1);
