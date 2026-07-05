@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import styles from '../Home.module.css';
@@ -5,7 +6,7 @@ import styles from '../Home.module.css';
 interface Tool {
   href: string;
   type: string;
-  icon: any;
+  icon: LucideIcon;
   title: string;
   desc: string;
   badge?: string;

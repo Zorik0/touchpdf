@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import jsQR from 'jsqr';
+import QRCode from 'qrcode';
 import { QrCode, Download, Copy, Check, Upload, ScanLine } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
@@ -27,32 +28,34 @@ export default function QrCodePage() {
     };
   }, [uploadPreview]);
 
-  const qrUrl = text.length > 0
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&color=${fgColor.replace('#', '')}&bgcolor=${bgColor.replace('#', '')}`
-    : null;
+  // Generate the QR code locally (no external service — files never leave the device)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    if (text.length === 0) { setQrDataUrl(null); return; }
+    QRCode.toDataURL(text, {
+      width: size,
+      margin: 2,
+      color: { dark: fgColor, light: bgColor },
+    })
+      .then(url => { if (!cancelled) setQrDataUrl(url); })
+      .catch(() => { if (!cancelled) setQrDataUrl(null); });
+    return () => { cancelled = true; };
+  }, [text, size, fgColor, bgColor]);
 
-  const downloadQr = async () => {
-    if (!qrUrl) return;
-    try {
-      const response = await fetch(qrUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `qr-code-${size}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-      addToast('QR code downloaded', 'success');
-    } catch {
-      addToast('Error downloading QR code', 'error');
-    }
+  const downloadQr = () => {
+    if (!qrDataUrl) return;
+    const a = document.createElement('a');
+    a.href = qrDataUrl;
+    a.download = `qr-code-${size}.png`;
+    a.click();
+    addToast('QR code downloaded', 'success');
   };
 
   const copyToClipboard = async () => {
-    if (!qrUrl) return;
+    if (!qrDataUrl) return;
     try {
-      const response = await fetch(qrUrl);
-      const blob = await response.blob();
+      const blob = await (await fetch(qrDataUrl)).blob();
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -292,9 +295,9 @@ export default function QrCodePage() {
             alignItems: 'center',
             aspectRatio: '1',
           }}>
-            {qrUrl && (
+            {qrDataUrl && (
               <img
-                src={qrUrl}
+                src={qrDataUrl}
                 alt="QR Code"
                 style={{ width: '100%', height: 'auto', imageRendering: 'pixelated' }}
               />

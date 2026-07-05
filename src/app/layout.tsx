@@ -100,9 +100,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  // Static icon files (in public/) — dynamic icon routes cost a function
+  // invocation per favicon request on Vercel.
   icons: {
-    icon: '/icon',
-    apple: '/apple-icon',
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
   },
   verification: {
     // Add your Google Search Console verification code here
@@ -266,12 +268,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
 
-        {/* Google AdSense — replace ca-pub-XXXX with your real publisher ID */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-          crossOrigin="anonymous"
-        />
+        {/* Google AdSense — set NEXT_PUBLIC_ADSENSE_CLIENT (ca-pub-…) at build time */}
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body>
         <ToastProvider>

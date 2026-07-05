@@ -52,25 +52,30 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
         draw();
     }, [rects, currentRect, width, height]);
 
-    const getPos = (e: React.MouseEvent) => {
+    const getPosFromClient = (clientX: number, clientY: number) => {
         const canvas = canvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
+        // The canvas may be displayed smaller than its internal size
+        // (maxWidth: 100%), so convert CSS pixels to canvas coordinates.
+        const scaleX = rect.width > 0 ? canvas.width / rect.width : 1;
+        const scaleY = rect.height > 0 ? canvas.height / rect.height : 1;
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
         };
     };
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const startDrawing = (clientX: number, clientY: number) => {
         setIsDrawing(true);
-        const pos = getPos(e);
-        setStartPos(pos);
+        setStartPos(getPosFromClient(clientX, clientY));
     };
 
-    const handleMouseMove = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: React.MouseEvent) => startDrawing(e.clientX, e.clientY);
+
+    const continueDrawing = (clientX: number, clientY: number) => {
         if (!isDrawing) return;
-        const pos = getPos(e);
+        const pos = getPosFromClient(clientX, clientY);
         
         const w = pos.x - startPos.x;
         const h = pos.y - startPos.y;
@@ -83,6 +88,8 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
             h: Math.abs(h)
         });
     };
+
+    const handleMouseMove = (e: React.MouseEvent) => continueDrawing(e.clientX, e.clientY);
 
     const handleMouseUp = () => {
         if (isDrawing && currentRect) {
@@ -100,11 +107,13 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
             ref={canvasRef}
             width={width}
             height={height}
-            style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                zIndex: 10, 
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 10,
                 cursor: 'crosshair',
                 touchAction: 'none'
             }}
@@ -114,19 +123,11 @@ export default function RedactionCanvas({ width, height, rects, onRectsChange }:
             onMouseLeave={handleMouseUp}
             onTouchStart={(e) => {
                 const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousedown', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                handleMouseDown(mouseEvent as any);
+                if (touch) startDrawing(touch.clientX, touch.clientY);
             }}
             onTouchMove={(e) => {
                 const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousemove', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                handleMouseMove(mouseEvent as any);
+                if (touch) continueDrawing(touch.clientX, touch.clientY);
             }}
             onTouchEnd={handleMouseUp}
         />

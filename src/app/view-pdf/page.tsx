@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 import { initPdfWorker } from '../lib/pdf-worker';
 import styles from './PDFViewer.module.css';
 import { BookOpen, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Upload } from 'lucide-react';
@@ -18,8 +19,9 @@ export default function ViewPDFPage() {
   const [dragging, setDragging] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pdfRef = useRef<any>(null);
-  const renderTaskRef = useRef<any>(null);
+  // State (not a ref) so the render effect re-runs when the document loads.
+  const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
+  const renderTaskRef = useRef<RenderTask | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load PDF when file changes
@@ -34,7 +36,7 @@ export default function ViewPDFPage() {
         const buf = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: buf }).promise;
         if (cancelled) return;
-        pdfRef.current = pdf;
+        setPdfDoc(pdf);
         setNumPages(pdf.numPages);
 
         // Restore last page
@@ -52,7 +54,7 @@ export default function ViewPDFPage() {
 
   // Render page
   useEffect(() => {
-    const pdf = pdfRef.current;
+    const pdf = pdfDoc;
     if (!pdf || !canvasRef.current) return;
     let cancelled = false;
 
@@ -80,8 +82,8 @@ export default function ViewPDFPage() {
         renderTaskRef.current = task;
         await task.promise;
         if (!cancelled) setLoading(false);
-      } catch (e: any) {
-        if (e?.name !== 'RenderingCancelledException') {
+      } catch (e) {
+        if ((e as Error)?.name !== 'RenderingCancelledException') {
           setLoading(false);
         }
       }
@@ -89,7 +91,7 @@ export default function ViewPDFPage() {
 
     render();
     return () => { cancelled = true; };
-  }, [pdfRef.current, currentPage, scale]);
+  }, [pdfDoc, currentPage, scale]);
 
   // Persist page to localStorage
   useEffect(() => {
@@ -113,7 +115,7 @@ export default function ViewPDFPage() {
 
   const handleFile = useCallback((f: File) => {
     if (f.type === 'application/pdf' || f.name.endsWith('.pdf')) {
-      pdfRef.current = null;
+      setPdfDoc(null);
       setNumPages(0);
       setCurrentPage(1);
       setFile(f);
@@ -166,7 +168,7 @@ export default function ViewPDFPage() {
           <div className={styles.toolbar}>
             <button
               className={styles.btn}
-              onClick={() => { pdfRef.current = null; setFile(null); setNumPages(0); }}
+              onClick={() => { setPdfDoc(null); setFile(null); setNumPages(0); }}
               title="Open another file"
             >
               <Upload size={16} />

@@ -134,12 +134,13 @@ export default function MdToPdfPage() {
           font-size: 14px;
         }
       `;
-      // Append base styles + user custom CSS
+      // Append base styles + user custom CSS. The custom CSS is wrapped in a
+      // #pdf-render-root block (native CSS nesting) so selectors like
+      // `body` or `h1` only style the render root, not the rest of the app
+      // while the temp element is attached.
       const styleTag = document.createElement('style');
-      styleTag.textContent = baseStyles + '\n' + customCss.replace(/body/g, '#pdf-render-root'); 
-      // Note: simplistic scoping replacement for body, but real CSS parsing is complex. 
-      // Users should use selectors that match the content.
-      
+      styleTag.textContent = baseStyles + '\n#pdf-render-root {\n' + customCss.replace(/\bbody\b/g, '&') + '\n}';
+
       tempDiv.appendChild(styleTag);
       document.body.appendChild(tempDiv);
 
@@ -267,8 +268,9 @@ export default function MdToPdfPage() {
             </div>
             {htmlContent ? (
               <div className={styles.previewContainer}>
-                 {/* Live preview style injection */}
-                 <style dangerouslySetInnerHTML={{ __html: customCss }} />
+                 {/* Live preview style injection — scoped to .md-preview so
+                     user CSS (e.g. `body { color: ... }`) can't restyle the app */}
+                 <style dangerouslySetInnerHTML={{ __html: `.md-preview {\n${customCss.replace(/\bbody\b/g, '&')}\n}` }} />
                  <div
                    ref={previewRef}
                    className="md-preview"
