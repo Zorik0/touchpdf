@@ -202,6 +202,42 @@ const TOOL_SEO: Record<string, ToolSEO> = {
         keywords: ['privacy policy', 'touchpdf privacy'],
         path: '/privacy',
     },
+    'annotate': {
+        title: 'Annotate PDF — Draw & Highlight on PDFs Online Free',
+        description: 'Draw, highlight, and mark up PDF documents in your browser. Annotations are flattened into the file. No uploads, completely private.',
+        keywords: ['annotate pdf', 'draw on pdf', 'highlight pdf', 'pdf markup', 'pdf annotation tool free'],
+        path: '/annotate',
+    },
+    'redact': {
+        title: 'Redact PDF — Black Out Sensitive Information Free',
+        description: 'Permanently cover sensitive information in PDFs with black redaction boxes. 100% client-side — files never leave your device.',
+        keywords: ['redact pdf', 'black out pdf', 'hide pdf text', 'pdf redaction tool', 'censor pdf free'],
+        path: '/redact',
+    },
+    'pdf-to-excel': {
+        title: 'PDF to Excel — Extract Tables from PDF to XLSX Free',
+        description: 'Extract table data from PDFs into editable Excel .xlsx workbooks. One sheet per page, processed entirely in your browser.',
+        keywords: ['pdf to excel', 'pdf to xlsx', 'extract table from pdf', 'convert pdf to spreadsheet', 'pdf table extractor'],
+        path: '/pdf-to-excel',
+    },
+    'batch-convert': {
+        title: 'Batch Convert — Bulk Convert Images & PDFs Free',
+        description: 'Convert many files at once: images to PDFs or PDFs to PNG images, downloaded as a ZIP. Fast, free, and private.',
+        keywords: ['batch convert', 'bulk pdf converter', 'convert multiple images to pdf', 'bulk pdf to image', 'batch file converter'],
+        path: '/batch-convert',
+    },
+    'unlock-pdf': {
+        title: 'Unlock PDF — Remove PDF Password & Restrictions Free',
+        description: 'Remove passwords and permission restrictions from PDFs you own. The file and password never leave your browser.',
+        keywords: ['unlock pdf', 'remove pdf password', 'decrypt pdf', 'pdf password remover', 'unprotect pdf free'],
+        path: '/unlock-pdf',
+    },
+    'privacy-clean': {
+        title: 'PDF Privacy Cleaner — Remove Hidden Metadata Free',
+        description: 'Strip author names, creation tools, timestamps, and hidden XMP metadata from PDFs before sharing. 100% on your device.',
+        keywords: ['remove pdf metadata', 'clean pdf metadata', 'pdf privacy', 'strip pdf author', 'anonymize pdf'],
+        path: '/privacy-clean',
+    },
     'terms': {
         title: 'Terms of Use',
         description: 'TouchPDF Terms of Use. Read our terms and conditions.',

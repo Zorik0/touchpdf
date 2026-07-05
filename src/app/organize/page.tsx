@@ -80,7 +80,7 @@ export default function OrganizePage() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-           await page.render({ canvasContext: ctx, viewport } as any).promise;
+           await page.render({ canvasContext: ctx, viewport }).promise;
            const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.8));
            if (blob) {
              const thumbnailUrl = URL.createObjectURL(blob);

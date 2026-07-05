@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TouchPDF
 
-## Getting Started
+Privacy-first PDF toolbox — 35+ tools that run **entirely in the browser**.
+No uploads, no accounts, no server-side processing: merging, splitting,
+converting, signing, redacting, annotating, and more, all done client-side
+with `pdf-lib`, `pdf.js`, `jsPDF`, and `JSZip`.
 
-First, run the development server:
+Live at [touchpdf.space](https://touchpdf.space).
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Google AdSense
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Ads are disabled until a publisher ID is configured. To enable them, set the
+environment variable at **build time**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1234567890123456
+```
 
-## Learn More
+(on Vercel: Project → Settings → Environment Variables, then redeploy)
 
-To learn more about Next.js, take a look at the following resources:
+This one variable drives everything:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- the AdSense loader script in `src/app/layout.tsx`
+- every `<AdSlot />` ad unit (they render nothing while unset, so the site
+  shows no empty ad boxes during review)
+- `/ads.txt`, generated automatically in the correct
+  `google.com, pub-…, DIRECT, f08c47fec0942fa0` format
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ad slot IDs are passed per-placement via the `slot` prop of
+`src/app/components/AdSlot.tsx`.
 
-## Deploy on Vercel
+## Project layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `src/app/<tool>/page.tsx` — one route per tool (all client components)
+- `src/app/<tool>/layout.tsx` — per-tool SEO metadata + JSON-LD (`src/app/lib/seo.ts`)
+- `src/app/lib/pdf-worker.ts` — shared pdf.js loader (worker served from `public/`)
+- `src/app/lib/ooxml.ts` — minimal .docx/.xlsx/.pptx build & parse helpers
+- `src/app/lib/pdf-text.ts` — positioned text extraction for PDF→Word/Excel
+- `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/manifest.ts` — SEO/PWA
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- `public/pdf.worker.min.mjs` must match the installed `pdfjs-dist` version
+  (copy from `node_modules/pdfjs-dist/build/` after upgrading).
+- PWA support is provided by `@ducanh2912/next-pwa`; `public/sw.js` is
+  generated during `npm run build`.

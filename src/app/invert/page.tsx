@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { PDFDocument, PDFName, PDFArray, PDFRawStream, PDFRef } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFArray, PDFDict, PDFRef } from 'pdf-lib';
 import JSZip from 'jszip';
 import { 
   ArrowRightLeft, 
@@ -169,18 +169,22 @@ export default function InvertPage() {
         const cropBox = page.node.get(PDFName.of('CropBox'));
         let boxArr: number[] = [0, 0, 612, 792]; // fallback A4
 
-        const resolveBox = (box: any): number[] | null => {
+        const numAt = (arr: PDFArray, idx: number, fallback: number): number => {
+          const el = arr.get(idx) as unknown as { numberValue?: number; value?: number } | undefined;
+          return el?.numberValue ?? el?.value ?? fallback;
+        };
+        const resolveBox = (box: unknown): number[] | null => {
           if (!box) return null;
-          let resolved = box;
+          let resolved: unknown = box;
           if (resolved instanceof PDFRef) {
             resolved = pdfDoc.context.lookup(resolved);
           }
           if (resolved instanceof PDFArray) {
             return [
-              (resolved.get(0) as any)?.numberValue ?? (resolved.get(0) as any)?.value ?? 0,
-              (resolved.get(1) as any)?.numberValue ?? (resolved.get(1) as any)?.value ?? 0,
-              (resolved.get(2) as any)?.numberValue ?? (resolved.get(2) as any)?.value ?? 612,
-              (resolved.get(3) as any)?.numberValue ?? (resolved.get(3) as any)?.value ?? 792,
+              numAt(resolved, 0, 0),
+              numAt(resolved, 1, 0),
+              numAt(resolved, 2, 612),
+              numAt(resolved, 3, 792),
             ];
           }
           return null;
@@ -216,16 +220,17 @@ export default function InvertPage() {
         }
 
         const gsName = 'GS_Invert';
-        let extGStateDict = (resourcesObj as any).get(PDFName.of('ExtGState'));
+        const resourcesDict = resourcesObj as PDFDict;
+        let extGStateDict = resourcesDict.get(PDFName.of('ExtGState'));
         if (!extGStateDict) {
           extGStateDict = pdfDoc.context.obj({});
-          (resourcesObj as any).set(PDFName.of('ExtGState'), extGStateDict);
+          resourcesDict.set(PDFName.of('ExtGState'), extGStateDict);
         }
 
         if (extGStateDict instanceof PDFRef) {
-          extGStateDict = pdfDoc.context.lookup(extGStateDict);
+          extGStateDict = pdfDoc.context.lookup(extGStateDict) as PDFDict;
         }
-        (extGStateDict as any).set(PDFName.of(gsName), extGStateRef);
+        (extGStateDict as PDFDict).set(PDFName.of(gsName), extGStateRef);
 
         // 3. Inject inversion rect covering the full page box
         const invertOps = `\nq\n/${gsName} gs\n1 1 1 rg\n${bx} ${by} ${bw} ${bh} re\nf\nQ\n`;

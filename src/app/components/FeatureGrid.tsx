@@ -1,10 +1,11 @@
+import type { LucideIcon } from 'lucide-react';
 import ToolCard from './ToolCard';
 import styles from '../Home.module.css';
 
 interface Tool {
     href: string;
     type: string;
-    icon: any;
+    icon: LucideIcon;
     title: string;
     desc: string;
     badge?: string;
