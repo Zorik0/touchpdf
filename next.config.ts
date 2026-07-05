@@ -23,10 +23,26 @@ const config: NextConfig = {
 export default withPWA({
   dest: "public",
   cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
+  // Aggressive mode prefetches every asset of each visited page — that
+  // multiplies CDN/edge requests per visitor for little benefit on a
+  // tool site where most visits touch one or two pages.
+  aggressiveFrontEndNavCaching: false,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
+  // Don't precache the 1.4MB pdf.js worker; it's fetched (and then
+  // runtime-cached) only when a PDF tool actually uses it.
+  publicExcludes: ["!pdf.worker.min.mjs"],
   workboxOptions: {
     disableDevLogs: true,
+    // Precache only the app shell. Per-route page chunks and lazy-loaded
+    // library chunks (pdf.js, pdf-lib, jsPDF, …) are excluded — they load
+    // (and get runtime-cached) on first use instead of forcing every new
+    // visitor to download all ~40 tool pages and PDF engines up front.
+    exclude: [
+      /\.map$/,
+      /static\/chunks\/app\/.+\/(page|layout|route)-[^/]+\.js$/,
+      /static\/chunks\/[0-9a-f]+[.-][^/]+\.js$/i,
+      /static\/chunks\/\d+[.-][^/]+\.js$/,
+    ],
   },
 })(config);

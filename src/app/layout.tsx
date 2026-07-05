@@ -100,9 +100,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  // Static icon files (in public/) — dynamic icon routes cost a function
+  // invocation per favicon request on Vercel.
   icons: {
-    icon: '/icon',
-    apple: '/apple-icon',
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
   },
   verification: {
     // Add your Google Search Console verification code here
