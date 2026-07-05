@@ -40,12 +40,12 @@ export default function RedactPage() {
     }
   };
 
-  const onPageLoadSuccess = (page: any) => {
+  const onPageLoadSuccess = (page: { width: number; height: number }) => {
       setPageWidth(page.width);
       setPageHeight(page.height);
   };
 
-  const handleRectsChange = (newPageRects: any[]) => {
+  const handleRectsChange = (newPageRects: Omit<RedactionRect, 'page'>[]) => {
       // Filter out rects for current page and add new ones
       const otherRects = rects.filter(r => r.page !== pageNumber);
       const currentRects = newPageRects.map(r => ({ ...r, page: pageNumber }));
@@ -94,7 +94,7 @@ export default function RedactPage() {
         const pdfBytes = await pdfDoc.save();
         
         // Download
-        const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+        const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;
@@ -182,7 +182,7 @@ export default function RedactPage() {
             <ShieldAlert size={20} className={styles.infoIcon} />
             <div>
                 <h3>True Redaction</h3>
-                <p>We draw opaque blocks over your content. For maximum security, we recommend checking the "Flatten" option (coming soon) to rasterize pages.</p>
+                <p>We draw opaque blocks over your content. For maximum security, we recommend checking the &ldquo;Flatten&rdquo; option (coming soon) to rasterize pages.</p>
             </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { initPdfWorker } from '../lib/pdf-worker';
 import styles from './Redact.module.css';
 import RedactionCanvas from './RedactionCanvas';
@@ -21,7 +22,7 @@ interface PDFViewerProps {
     scale: number;
     onLoadSuccess: (data: { numPages: number }) => void;
     onPageLoadSuccess: (page: { width: number; height: number }) => void;
-    onRectsChange: (rects: any[]) => void;
+    onRectsChange: (rects: Omit<RedactionRect, 'page'>[]) => void;
 }
 
 export default function PDFViewer({ 
@@ -37,7 +38,8 @@ export default function PDFViewer({
     const [pageHeight, setPageHeight] = useState(0);
     const [loading, setLoading] = useState(true);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const pdfDocRef = useRef<any>(null);
+    // State (not a ref) so the render effect re-runs once the document loads.
+    const [pdfDoc, setPdfDoc] = useState<PDFDocumentProxy | null>(null);
 
     // Get rects for current page (strip page property for canvas)
     const currentPageRects = rects.filter(r => r.page === pageNumber).map(({ page, ...rest }) => rest);
@@ -55,7 +57,7 @@ export default function PDFViewer({
 
                 if (cancelled) return;
 
-                pdfDocRef.current = pdf;
+                setPdfDoc(pdf);
                 onLoadSuccess({ numPages: pdf.numPages });
             } catch (err) {
                 console.error('Error loading PDF:', err);
@@ -68,7 +70,7 @@ export default function PDFViewer({
 
     // Render the current page
     useEffect(() => {
-        const pdf = pdfDocRef.current;
+        const pdf = pdfDoc;
         if (!pdf || !canvasRef.current) return;
 
         let cancelled = false;
@@ -88,7 +90,7 @@ export default function PDFViewer({
                 if (!ctx) return;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                await page.render({ canvasContext: ctx, viewport } as any).promise;
+                await page.render({ canvasContext: ctx, viewport }).promise;
 
                 if (cancelled) return;
 
@@ -103,7 +105,8 @@ export default function PDFViewer({
 
         renderPage();
         return () => { cancelled = true; };
-    }, [pdfDocRef.current, pageNumber, scale]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pdfDoc, pageNumber, scale]);
 
     return (
         <div className={styles.pdfDocument}>

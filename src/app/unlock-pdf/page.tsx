@@ -77,8 +77,7 @@ export default function UnlockPdfPage() {
         canvas.width = vp.width;
         canvas.height = vp.height;
         const ctx = canvas.getContext('2d')!;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await page.render({ canvasContext: ctx, viewport: vp } as any).promise;
+        await page.render({ canvasContext: ctx, viewport: vp }).promise;
 
         const imgBytes = await fetch(canvas.toDataURL('image/jpeg', 0.92)).then(r => r.arrayBuffer());
         const img = await newPdf.embedJpg(new Uint8Array(imgBytes));
