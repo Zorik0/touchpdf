@@ -3,68 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Home,
-  Combine,
-  Scissors,
-  Layers,
-  Grid,
-  X,
-  Minimize2,
-  RotateCw,
-  ImageIcon,
-  FileText,
-  Droplets,
-  Lock,
-  Eraser,
-  ArrowRightLeft,
-  FileCode,
-  Image as LucideImage,
-  Printer,
-  Hash,
-  PenLine,
-  ImageDown,
-  QrCode,
-  Diff,
-  FileUser,
-  Receipt,
-  Award,
-  Palette,
-  Crop,
-  ArrowDownUp,
-  FilePlus2,
-} from 'lucide-react';
+import { Home, Combine, Scissors, Layers, Grid, X } from 'lucide-react';
 import styles from './MobileBottomNav.module.css';
-
-const allTools = [
-  { href: '/merge-pdf', label: 'Merge', icon: Combine },
-  { href: '/split-pdf', label: 'Split', icon: Scissors },
-  { href: '/compress-pdf', label: 'Compress', icon: Minimize2 },
-  { href: '/organize', label: 'Organize', icon: Layers },
-  { href: '/rotate-pdf', label: 'Rotate', icon: RotateCw },
-  { href: '/sign-pdf', label: 'Sign PDF', icon: PenLine },
-  { href: '/page-numbers', label: 'Page #', icon: Hash },
-  { href: '/crop-pdf', label: 'Crop', icon: Crop },
-  { href: '/grayscale', label: 'Grayscale', icon: Palette },
-  { href: '/reverse-pdf', label: 'Reverse', icon: ArrowDownUp },
-  { href: '/blank-pages', label: 'Blanks', icon: FilePlus2 },
-  { href: '/metadata-editor', label: 'Metadata', icon: FileText },
-  { href: '/compare-pdf', label: 'Compare', icon: Diff },
-  { href: '/pdf-to-png', label: 'PDF → Img', icon: LucideImage },
-  { href: '/png-to-pdf', label: 'Img → PDF', icon: LucideImage },
-  { href: '/print-assistor', label: 'Print', icon: Printer },
-  { href: '/compress-image', label: 'Img Comp', icon: ImageDown },
-  { href: '/qr-code', label: 'QR Code', icon: QrCode },
-  { href: '/word-to-pdf', label: 'Word→PDF', icon: FileText },
-  { href: '/watermark-pdf', label: 'Watermark', icon: Droplets },
-  { href: '/protect-pdf', label: 'Protect', icon: Lock },
-  { href: '/redact', label: 'Redact', icon: Eraser },
-  { href: '/invert', label: 'Invert', icon: ArrowRightLeft },
-  { href: '/md-to-pdf', label: 'MD→PDF', icon: FileCode },
-  { href: '/resume-builder', label: 'Resume', icon: FileUser },
-  { href: '/invoice-generator', label: 'Invoice', icon: Receipt },
-  { href: '/certificate-generator', label: 'Cert', icon: Award },
-];
+import { ALL_TOOLS, CATEGORIES } from '../lib/tools';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -89,22 +30,27 @@ export default function MobileBottomNav() {
                 <X size={20} />
               </button>
             </div>
-            <div className={styles.menuGrid}>
-              {allTools.map(({ href, label, icon: Icon }) => {
-                const isActive = pathname === href;
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={`${styles.menuItem} ${isActive ? styles.menuItemActive : ''}`}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <Icon size={22} />
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-            </div>
+            {CATEGORIES.map(cat => (
+              <div key={cat}>
+                <div className={styles.menuCategory}>{cat}</div>
+                <div className={styles.menuGrid}>
+                  {ALL_TOOLS.filter(t => t.cat === cat).map(({ href, title, icon: Icon }) => {
+                    const isActive = pathname === href;
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`${styles.menuItem} ${isActive ? styles.menuItemActive : ''}`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Icon size={20} />
+                        <span>{title}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
