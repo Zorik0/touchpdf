@@ -166,3 +166,16 @@
         display: none;
     }
 }
+.menuCategory {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 18px 4px 8px;
+}
+
+.menuItem span {
+    text-align: center;
+    line-height: 1.25;
+}

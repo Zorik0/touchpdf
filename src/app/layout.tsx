@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
 import { ToastProvider } from "./components/ui/Toast";
+import { ToolBreadcrumb, RelatedTools } from "./components/ToolChrome";
 
 const DOMAIN = 'https://touchpdf.space';
 
@@ -280,7 +281,9 @@ export default function RootLayout({
       <body>
         <ToastProvider>
           <main className="main-content">
+            <ToolBreadcrumb />
             {children}
+            <RelatedTools />
           </main>
           
           <footer className="site-footer">

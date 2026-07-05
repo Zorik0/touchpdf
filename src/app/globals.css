@@ -78,7 +78,7 @@ body::after {
 .main-content {
   min-height: 100vh;
   padding-bottom: 120px;
-  padding-top: 100px;
+  padding-top: 78px;
   /* room for top navbar */
   position: relative;
   z-index: 1;
@@ -199,7 +199,7 @@ body::after {
 /* ── Section Typography ── */
 .section-header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 28px;
 }
 
 .section-badge {
@@ -213,13 +213,13 @@ body::after {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--accent-2);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .section-title {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: 10px;
