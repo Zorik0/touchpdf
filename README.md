@@ -18,8 +18,10 @@ npm run lint
 
 ## Google AdSense
 
-Ads are disabled until a publisher ID is configured. To enable them, set the
-environment variable at **build time**:
+The publisher ID lives in `src/app/lib/adsense.ts` (currently the site's real
+`ca-pub-8520243761490725`). Override it for a build by setting
+`NEXT_PUBLIC_ADSENSE_CLIENT` at **build time** — e.g. to a dummy value for a
+staging deploy that shouldn't serve real ads:
 
 ```bash
 NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1234567890123456
@@ -27,11 +29,10 @@ NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1234567890123456
 
 (on Vercel: Project → Settings → Environment Variables, then redeploy)
 
-This one variable drives everything:
+This one constant drives everything:
 
 - the AdSense loader script in `src/app/layout.tsx`
-- every `<AdSlot />` ad unit (they render nothing while unset, so the site
-  shows no empty ad boxes during review)
+- every `<AdSlot />` ad unit
 - `/ads.txt`, generated automatically in the correct
   `google.com, pub-…, DIRECT, f08c47fec0942fa0` format
 

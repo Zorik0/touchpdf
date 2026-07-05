@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { ADSENSE_CLIENT } from '../lib/adsense';
 
 interface AdSlotProps {
   slot: string;        // Your Google Ads slot ID
@@ -8,24 +9,18 @@ interface AdSlotProps {
   className?: string;
 }
 
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
-
 /**
- * Google AdSense unit.
- * Configure by setting NEXT_PUBLIC_ADSENSE_CLIENT (e.g. "ca-pub-1234567890")
- * at build time. When unset, nothing is rendered — no empty ad boxes.
- * The AdSense loader script is added in layout.tsx from the same variable.
+ * Google AdSense unit. Publisher ID comes from lib/adsense.ts (overridable
+ * via NEXT_PUBLIC_ADSENSE_CLIENT at build time). The loader script in
+ * layout.tsx uses the same constant.
  */
 export default function AdSlot({ slot, format = 'auto', className = '' }: AdSlotProps) {
   useEffect(() => {
-    if (!ADSENSE_CLIENT) return;
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
     } catch { /* ad blocked or script not loaded */ }
   }, []);
-
-  if (!ADSENSE_CLIENT) return null;
 
   return (
     <div className={`ad-slot ${className}`}>

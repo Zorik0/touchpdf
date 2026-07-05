@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
 import { ToastProvider } from "./components/ui/Toast";
 import { ToolBreadcrumb, RelatedTools } from "./components/ToolChrome";
+import { ADSENSE_CLIENT } from "./lib/adsense";
 
 const DOMAIN = 'https://touchpdf.space';
 
@@ -269,14 +270,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
 
-        {/* Google AdSense — set NEXT_PUBLIC_ADSENSE_CLIENT (ca-pub-…) at build time */}
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`}
-            crossOrigin="anonymous"
-          />
-        )}
+        {/* Google AdSense — publisher ID from lib/adsense.ts */}
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <ToastProvider>
