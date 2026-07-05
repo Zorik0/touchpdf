@@ -2,31 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  ArrowRightLeft, 
-  FileText, 
-  Image as ImageIcon, 
-  FileStack, 
-  Layers, 
-  Type,
+import {
   Combine,
   Scissors,
   Minimize2,
-  RotateCw,
-  Droplets,
-  Lock,
-  Search
+  Layers,
+  FileText,
+  LayoutGrid,
 } from 'lucide-react';
 import Logo from './Logo';
 import styles from './Navbar.module.css';
 
 const navLinks = [
   { href: '/merge-pdf', label: 'Merge', icon: Combine },
-  { href: '/compress-pdf', label: 'Compress', icon: Minimize2 },
   { href: '/split-pdf', label: 'Split', icon: Scissors },
+  { href: '/compress-pdf', label: 'Compress', icon: Minimize2 },
   { href: '/organize', label: 'Organize', icon: Layers },
-  { href: '/word-to-pdf', label: 'Word to PDF', icon: FileText },
-  { href: '/pdf-to-png', label: 'PDF to Image', icon: ImageIcon },
+  { href: '/pdf-to-word', label: 'Convert', icon: FileText },
 ];
 
 export default function Navbar() {
@@ -35,10 +27,11 @@ export default function Navbar() {
   return (
     <div className={`${styles.navbarContainer} ${styles.desktopOnly}`}>
       <nav className={styles.navbarPill}>
-        <Link href="/" className={styles.logoLink} title="Home">
-          <Logo size={24} showText={false} />
+        <Link href="/" className={styles.logoLink} title="TouchPDF home">
+          <Logo size={22} showText={false} />
+          <span className={styles.logoText}>touch<em>pdf</em></span>
         </Link>
-        
+
         <div className={styles.divider} />
 
         {navLinks.map((link) => {
@@ -49,29 +42,19 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className={`${styles.navItem} ${isActive ? styles.active : ''}`}
-              title={link.label}
             >
-              <Icon size={18} className={styles.navIcon} />
-              <span className={styles.navLabel}>{link.label}</span>
+              <Icon size={15} />
+              <span>{link.label}</span>
             </Link>
           );
         })}
 
         <div className={styles.divider} />
 
-        <Link
-          href="/#search" 
-          className={styles.navItem}
-          title="Search Tools"
-          onClick={(e) => {
-             // If we are on homepage, maybe focus search? 
-             // For now just linking to generic anchor or just /
-          }}
-        >
-            <Search size={18} className={styles.navIcon} />
-            <span className={styles.navLabel}>Search</span>
+        <Link href="/" className={`${styles.navItem} ${styles.allTools}`}>
+          <LayoutGrid size={15} />
+          <span>All tools</span>
         </Link>
-
       </nav>
     </div>
   );

@@ -1,27 +1,33 @@
-/* ── Hero ── */
+/* ── Hero (compact) ── */
 .hero {
-    padding: 60px 20px 80px;
+    padding: 20px 0 40px;
     text-align: center;
-    max-width: 1200px;
+    max-width: 1160px;
     margin: 0 auto;
 }
 
-.heroTitle {
-    font-size: 4.5rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
+.heroTop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
     margin-bottom: 24px;
-    line-height: 1.1;
+}
+
+.heroTitle {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
     color: var(--text-primary);
+    margin: 0;
 }
 
 .heroSubtitle {
-    font-size: 1.25rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
-    max-width: 680px;
-    margin: 0 auto 48px;
-    line-height: 1.6;
-    font-weight: 400;
+    margin: 0;
+    line-height: 1.5;
 }
 
 /* ── Trust Bar ── */
@@ -29,18 +35,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    margin-bottom: 60px;
+    gap: 14px;
+    margin: 48px 0 8px;
     flex-wrap: wrap;
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 500;
 }
 
 .trustItem {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 }
 
 .trustDivider {
@@ -53,29 +59,16 @@
     opacity: 0.9;
 }
 
-/* ── Visual Proof Placeholder ── */
-.visualProof {
-    margin: 40px auto 80px;
-    max-width: 800px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    color: var(--text-muted);
-    font-style: italic;
-}
-
 /* ── Search Bar ── */
 .searchWrapper {
     position: relative;
-    max-width: 560px;
-    margin: 0 auto 56px;
+    max-width: 540px;
+    margin: 0 auto 18px;
 }
 
 .searchIcon {
     position: absolute;
-    left: 20px;
+    left: 18px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
@@ -84,13 +77,13 @@
 
 .searchInput {
     width: 100%;
-    padding: 16px 56px 16px 52px;
+    padding: 14px 52px 14px 48px;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     color: var(--text-primary);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 0.95rem;
     outline: none;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
@@ -98,18 +91,18 @@
 
 .searchInput::placeholder {
     color: var(--text-muted);
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .searchInput:focus {
     border-color: var(--accent-1);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.07);
     box-shadow: 0 0 0 4px rgba(232, 115, 74, 0.1);
 }
 
 .searchClear {
     position: absolute;
-    right: 16px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -128,152 +121,136 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* ── Feature Badges ── */
-.featureBadges {
+.searchResultHeader {
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+/* ── Category quick-nav ── */
+.catNav {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
-    max-width: 800px;
-    margin: 0 auto 40px;
+    gap: 8px;
+    margin: 0 auto 36px;
+    max-width: 900px;
 }
 
-.featureBadge {
+.catChip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 12px;
-    font-size: 0.72rem;
-    font-weight: 500;
+    gap: 7px;
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 100px;
     text-decoration: none;
     white-space: nowrap;
-    transition: all 0.2s ease;
-    cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.featureBadge:hover {
+.catChip:hover {
     color: var(--accent-1);
-    border-color: rgba(232, 115, 74, 0.3);
-    background: rgba(232, 115, 74, 0.06);
-    transform: translateY(-1px);
+    border-color: rgba(232, 115, 74, 0.4);
+    background: rgba(232, 115, 74, 0.07);
 }
 
-.visualProofWrap {
-    margin-bottom: 40px;
+.catCount {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 100px;
+    padding: 1px 7px;
+}
+
+.catChip:hover .catCount {
+    color: var(--accent-1);
+    background: rgba(232, 115, 74, 0.12);
 }
 
 .emptySearch {
     text-align: center;
-    padding: 60px 20px;
+    padding: 48px 20px;
     color: var(--text-muted);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
-/* ── Feature Grid Section ── */
+/* ── Feature Grid ── */
 .featureGridContainer {
-    max-width: 1200px;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 20px;
-}
-
-.gridHeader {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.sectionTitle {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--text-primary);
-}
-
-.sectionSubtitle {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-}
-
-.gridContent {
-    display: flex;
-    flex-direction: column;
-    gap: 60px;
+    text-align: left;
 }
 
 .categoryGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    margin-bottom: 34px;
+    /* Anchor jumps land below the fixed navbar */
+    scroll-margin-top: 90px;
 }
 
 .categoryHeader {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
 .categoryTitle {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    font-weight: 700;
     color: var(--text-primary);
     margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.categoryCount {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
 }
 
 .toolGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
 }
 
-/* ── Tool Card ── */
+/* ── Tool Card (dense, horizontal) ── */
 .toolCard {
     display: flex;
-    flex-direction: column;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    transition: background 0.15s ease, border-color 0.15s ease;
     text-decoration: none;
-    position: relative;
     cursor: pointer;
-    height: 100%;
 }
 
 .toolCard:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.12);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.3);
-}
-
-.toolHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(232, 115, 74, 0.45);
 }
 
 .toolIconWrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Default subtle bg — overridden per type */
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
-    transition: transform 0.3s ease;
-}
-
-.toolCard:hover .toolIconWrapper {
-    transform: scale(1.05);
 }
 
 /* Color variants by data-type */
@@ -307,159 +284,106 @@
     background: rgba(192, 132, 252, 0.1);
 }
 
+.toolCard[data-type="other"] .toolIconWrapper {
+    color: #a3a3b8;
+    background: rgba(163, 163, 184, 0.1);
+}
+
 .toolInfo {
-    flex: 1;
-    margin-bottom: 20px;
+    min-width: 0;
 }
 
 .toolTitle {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 6px;
-    line-height: 1.3;
-}
-
-.toolDesc {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-}
-
-.toolAction {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
+    gap: 8px;
+    font-size: 0.92rem;
     font-weight: 600;
-    color: var(--accent-1);
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.3s ease;
-}
-
-.toolCard:hover .toolAction {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.newBadge {
-    background: var(--accent-1);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 4px 12px rgba(232, 115, 74, 0.3);
-}
-
-
-/* ── Ad Slots ── */
-.adBanner {
-    margin: 40px auto;
-    width: 100%;
-    max-width: 960px;
-    min-height: 100px;
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px dashed rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--text-primary);
+    margin: 0 0 2px;
+    line-height: 1.3;
+    white-space: nowrap;
     overflow: hidden;
 }
 
-.adInline {
-    margin: 32px 0;
-    min-height: 120px;
-    background: rgba(255, 255, 255, 0.01);
-    border: 1px dashed rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+.toolDesc {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.newBadge {
+    flex-shrink: 0;
+    background: rgba(232, 115, 74, 0.14);
+    color: var(--accent-2);
+    border: 1px solid rgba(232, 115, 74, 0.3);
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* ── Ad Slots ── */
+.adBanner {
+    margin: 24px auto 0;
+    width: 100%;
+    max-width: 960px;
+    overflow: hidden;
 }
 
 /* ── Responsive ── */
-@media (max-width: 1024px) {
-    .toolGrid {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    }
-}
-
 @media (max-width: 768px) {
+    .hero {
+        padding-top: 8px;
+    }
+
     .heroTitle {
-        font-size: 3rem;
+        font-size: 1.5rem;
+        padding: 0 8px;
     }
 
     .heroSubtitle {
-        font-size: 1.1rem;
+        font-size: 0.85rem;
+        padding: 0 12px;
+    }
+
+    .catNav {
+        gap: 6px;
+        margin-bottom: 28px;
+    }
+
+    .catChip {
+        font-size: 0.75rem;
+        padding: 6px 11px;
     }
 
     .toolGrid {
         grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     .toolCard {
-        flex-direction: row;
-        align-items: center;
-        padding: 16px;
-        gap: 16px;
-    }
-
-    .toolInfo {
-        margin-bottom: 0;
-    }
-
-    .toolAction {
-        display: none;
-    }
-
-    .toolIconWrapper {
-        width: 40px;
-        height: 40px;
+        padding: 10px 12px;
     }
 
     .trustBar {
-        flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        font-size: 0.75rem;
     }
 
     .trustDivider {
         display: none;
     }
-
-    .categoryHeader {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .visualProofWrap {
-        display: none;
-    }
-
-    .featureBadges {
-        max-width: 100%;
-        margin-bottom: 24px;
-        gap: 4px;
-    }
-
-    .featureBadge {
-        font-size: 0.65rem;
-        padding: 3px 8px;
-    }
 }
 
-@media (max-width: 480px) {
-    .header {
-        padding: 40px 0 20px;
-    }
-
-    .title {
-        font-size: 2rem;
-    }
-
-    .heroTitle {
-        font-size: 2.5rem;
+@media (min-width: 769px) and (max-width: 1024px) {
+    .toolGrid {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     }
 }
