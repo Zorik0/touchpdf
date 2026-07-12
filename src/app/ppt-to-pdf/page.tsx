@@ -5,6 +5,7 @@ import jsPDF from 'jspdf';
 import { Presentation, Upload, Download, Loader2, X, Info } from 'lucide-react';
 import { parsePptx, SlideData } from '../lib/ooxml';
 import { useToast } from '../components/ui/Toast';
+import { serverConvert, downloadBlob, isUnreachable } from '../lib/api';
 
 export default function PptToPdfPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,9 +34,28 @@ export default function PptToPdfPage() {
     }
   };
 
-  const generatePdf = () => {
-    if (!file || slides.length === 0) return;
+  const generatePdf = async () => {
+    if (!file) return;
     setIsProcessing(true);
+
+    // True conversion on our server (LibreOffice): slides render exactly as
+    // designed — themes, images, layouts. Falls back to the text-handout
+    // renderer below when the server can't be reached.
+    try {
+      const blob = await serverConvert(file, 'pdf');
+      downloadBlob(blob, file.name.replace(/\.pptx$/i, '') + '.pdf');
+      addToast('PDF downloaded', 'success');
+      setIsProcessing(false);
+      return;
+    } catch (e) {
+      if (!isUnreachable(e)) {
+        addToast(e instanceof Error ? e.message : 'Error generating PDF', 'error');
+        setIsProcessing(false);
+        return;
+      }
+    }
+
+    if (slides.length === 0) { setIsProcessing(false); return; }
     try {
       // 16:9 slide-shaped pages
       const pageW = 254, pageH = 142.9, margin = 16;
@@ -100,7 +120,7 @@ export default function PptToPdfPage() {
         <div className="section-header">
           <div className="section-badge"><Presentation size={14} /> PPT to PDF</div>
           <h1 className="section-title">PowerPoint to <span className="gradient-text">PDF</span></h1>
-          <p className="section-subtitle">Convert .pptx slides into a clean PDF handout — titles and bullet text, one page per slide, all in your browser.</p>
+          <p className="section-subtitle">True .pptx to PDF conversion — slides render exactly as designed. Files are converted securely and never stored.</p>
         </div>
 
         {!file ? (

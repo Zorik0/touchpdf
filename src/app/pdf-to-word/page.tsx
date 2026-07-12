@@ -5,6 +5,7 @@ import { FileText, Upload, Download, Loader2, X, Info } from 'lucide-react';
 import { extractPageLines, lineToText } from '../lib/pdf-text';
 import { buildDocx, DocxParagraph } from '../lib/ooxml';
 import { useToast } from '../components/ui/Toast';
+import { serverConvert, downloadBlob, isUnreachable } from '../lib/api';
 
 export default function PdfToWordPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -45,8 +46,27 @@ export default function PdfToWordPage() {
   };
 
   const downloadDocx = async () => {
-    if (!file || paragraphs.length === 0) return;
+    if (!file) return;
     setIsProcessing(true);
+
+    // High-fidelity conversion on our server (LibreOffice) — keeps layout and
+    // images, not just text. Falls back to in-browser text extraction if the
+    // server can't be reached.
+    try {
+      const blob = await serverConvert(file, 'docx');
+      downloadBlob(blob, file.name.replace(/\.pdf$/i, '') + '.docx');
+      addToast('Word document downloaded', 'success');
+      setIsProcessing(false);
+      return;
+    } catch (e) {
+      if (!isUnreachable(e)) {
+        addToast(e instanceof Error ? e.message : 'Failed to convert.', 'error');
+        setIsProcessing(false);
+        return;
+      }
+    }
+
+    if (paragraphs.length === 0) { setIsProcessing(false); return; }
     try {
       const blob = await buildDocx(paragraphs);
       const url = URL.createObjectURL(blob);
@@ -73,7 +93,7 @@ export default function PdfToWordPage() {
         <div className="section-header">
           <div className="section-badge"><FileText size={14} /> PDF to Word</div>
           <h1 className="section-title">PDF to <span className="gradient-text">Word</span></h1>
-          <p className="section-subtitle">Convert PDF text into an editable .docx document — entirely in your browser, no uploads.</p>
+          <p className="section-subtitle">Convert PDFs into editable .docx documents with layout preserved. Files are converted securely and never stored.</p>
         </div>
 
         {!file ? (
@@ -105,10 +125,10 @@ export default function PdfToWordPage() {
 
                 <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 16 }}>
                   <Info size={14} style={{ flexShrink: 0, marginTop: 1 }} />
-                  <span>Text-based conversion: paragraphs and headings are preserved, exact layout and images are not.</span>
+                  <span>High-fidelity conversion keeps layout and images. The preview above shows extracted text only.</span>
                 </div>
 
-                <button className="btn btn-primary" onClick={downloadDocx} disabled={isProcessing || paragraphs.length === 0} style={{ width: '100%' }}>
+                <button className="btn btn-primary" onClick={downloadDocx} disabled={isProcessing} style={{ width: '100%' }}>
                   {isProcessing ? <><Loader2 className="spinner" /> Working...</> : <><Download size={18} /> Download .docx</>}
                 </button>
               </>
