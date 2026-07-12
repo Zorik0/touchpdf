@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import mammoth from 'mammoth';
 import { FileText, Upload, Download, Loader2, ListRestart } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
+import { serverConvert, downloadBlob, isUnreachable } from '../lib/api';
 
 export default function WordToPdfPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -35,9 +36,27 @@ export default function WordToPdfPage() {
   }, []);
 
   const convertToPdf = async () => {
-    if (!htmlContent) return;
+    if (!file) return;
     setIsConverting(true);
 
+    // True conversion on our server (LibreOffice): real text, real layout,
+    // proper pagination. The document is processed in memory and deleted
+    // immediately after.
+    try {
+      const blob = await serverConvert(file, 'pdf');
+      downloadBlob(blob, file.name.replace(/\.docx$/i, '') + '.pdf');
+      setIsConverting(false);
+      return;
+    } catch (err) {
+      if (!isUnreachable(err)) {
+        addToast(err instanceof Error ? err.message : 'Failed to convert.', 'error');
+        setIsConverting(false);
+        return;
+      }
+      // Server unreachable — fall back to the in-browser snapshot conversion.
+    }
+
+    if (!htmlContent) { setIsConverting(false); return; }
     try {
       // Dynamic import to avoid SSR issues
       const html2canvas = (await import('html2canvas')).default;
@@ -92,7 +111,7 @@ export default function WordToPdfPage() {
         <div className="section-header">
           <div className="section-badge"><FileText size={14} /> Word Converter</div>
           <h1 className="section-title">Word to <span className="gradient-text">PDF</span></h1>
-          <p className="section-subtitle">Convert .docx files to PDF. Preview before downloading. 100% client-side.</p>
+          <p className="section-subtitle">True .docx to PDF conversion — real text, fonts and pagination. Files are converted securely and never stored.</p>
         </div>
 
         {!file ? (
@@ -113,7 +132,7 @@ export default function WordToPdfPage() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn btn-ghost" onClick={reset}><ListRestart size={16} /></button>
-                <button className="btn btn-primary" onClick={convertToPdf} disabled={isConverting || !htmlContent}>
+                <button className="btn btn-primary" onClick={convertToPdf} disabled={isConverting}>
                   {isConverting ? <><Loader2 className="spinner" /> Converting...</> : <><Download size={16} /> Download PDF</>}
                 </button>
               </div>

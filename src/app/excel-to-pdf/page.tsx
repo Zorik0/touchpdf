@@ -5,6 +5,7 @@ import jsPDF from 'jspdf';
 import { FileSpreadsheet, Upload, Download, Loader2, X, Info } from 'lucide-react';
 import { parseXlsx, SheetData } from '../lib/ooxml';
 import { useToast } from '../components/ui/Toast';
+import { serverConvert, downloadBlob, isUnreachable } from '../lib/api';
 
 export default function ExcelToPdfPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -35,9 +36,28 @@ export default function ExcelToPdfPage() {
     }
   };
 
-  const generatePdf = () => {
-    if (!file || sheets.length === 0) return;
+  const generatePdf = async () => {
+    if (!file) return;
     setIsProcessing(true);
+
+    // True conversion on our server (LibreOffice): real cell formatting,
+    // column widths and styling. Falls back to the simple table renderer
+    // below when the server can't be reached.
+    try {
+      const blob = await serverConvert(file, 'pdf');
+      downloadBlob(blob, file.name.replace(/\.xlsx$/i, '') + '.pdf');
+      addToast('PDF downloaded', 'success');
+      setIsProcessing(false);
+      return;
+    } catch (e) {
+      if (!isUnreachable(e)) {
+        addToast(e instanceof Error ? e.message : 'Error generating PDF', 'error');
+        setIsProcessing(false);
+        return;
+      }
+    }
+
+    if (sheets.length === 0) { setIsProcessing(false); return; }
     try {
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
       const pageW = 297, pageH = 210, margin = 12;
@@ -105,7 +125,7 @@ export default function ExcelToPdfPage() {
         <div className="section-header">
           <div className="section-badge"><FileSpreadsheet size={14} /> Excel to PDF</div>
           <h1 className="section-title">Excel to <span className="gradient-text">PDF</span></h1>
-          <p className="section-subtitle">Turn .xlsx spreadsheets into clean, printable PDF tables — one page per sheet, processed on your device.</p>
+          <p className="section-subtitle">True .xlsx to PDF conversion with real formatting preserved. Files are converted securely and never stored.</p>
         </div>
 
         {!file ? (

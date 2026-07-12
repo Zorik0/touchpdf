@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import { useToast } from '../components/ui/Toast';
+import { serverCompress, isUnreachable } from '../lib/api';
 import { Minimize2, Upload, FileText, Download, Loader2, ListRestart, Info } from 'lucide-react';
 
 export default function CompressPdfPage() {
@@ -34,6 +35,25 @@ export default function CompressPdfPage() {
   const compressPdf = async () => {
     if (!file) return;
     setIsProcessing(true);
+
+    // Real compression on our server (Ghostscript re-encodes images and
+    // streams) — typically far smaller than the in-browser structural pass,
+    // which remains as the offline fallback below.
+    try {
+      const blob = await serverCompress(file, 'ebook');
+      const url = URL.createObjectURL(blob);
+      setCompressedUrl(url);
+      setCompressedSize(blob.size);
+      setDone(true);
+      setIsProcessing(false);
+      return;
+    } catch (err) {
+      if (!isUnreachable(err)) {
+        addToast(err instanceof Error ? err.message : 'Failed to compress PDF.', 'error');
+        setIsProcessing(false);
+        return;
+      }
+    }
 
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -99,7 +119,7 @@ export default function CompressPdfPage() {
         <div className="section-header">
           <div className="section-badge"><Minimize2 size={14} /> Compress</div>
           <h1 className="section-title">Compress <span className="gradient-text">PDF</span></h1>
-          <p className="section-subtitle">Reduce file size by stripping metadata and optimizing structure. 100% client-side.</p>
+          <p className="section-subtitle">Real compression — images and streams are re-encoded for much smaller files. Processed securely, never stored.</p>
         </div>
 
         {!file ? (
