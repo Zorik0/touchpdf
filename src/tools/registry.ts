@@ -27,7 +27,22 @@ export type ToolMeta = {
   seo: { title: string; description: string };
 };
 
-export const TOOLS: ToolMeta[] = [];
+export const TOOLS: ToolMeta[] = [
+  {
+    slug: "merge-pdf",
+    name: "Merge PDF",
+    summary: "Combine PDFs into one file",
+    description: "Combine several PDFs into one file, in the order you choose.",
+    category: "organize",
+    input: { accept: "pdf", multiple: true },
+    zipName: "merged.zip",
+    seo: {
+      title: "Merge PDF files for free",
+      description:
+        "Combine PDF files into one document in the order you choose. Free, no sign-up, and your files never leave your device.",
+    },
+  },
+];
 
 export function findTool(slug: string): ToolMeta | undefined {
   return TOOLS.find((tool) => tool.slug === slug);
