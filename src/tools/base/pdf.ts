@@ -49,6 +49,22 @@ export async function openPdfView(toolFile: ToolFile): Promise<PDFDocumentProxy>
   }
 }
 
+const encryption = new WeakMap<File, Promise<boolean>>();
+
+/** Whether a PDF has any encryption, including permission-only restrictions. */
+export function isEncrypted(toolFile: ToolFile): Promise<boolean> {
+  let result = encryption.get(toolFile.file);
+  if (!result) {
+    result = (async () => {
+      const { PDFDocument } = await loadPdfLib();
+      const doc = await PDFDocument.load(await readBytes(toolFile.file), { ignoreEncryption: true, updateMetadata: false });
+      return doc.isEncrypted;
+    })();
+    encryption.set(toolFile.file, result);
+  }
+  return result;
+}
+
 const pageCounts = new WeakMap<File, Map<string, Promise<number>>>();
 
 /** Page count, read once per file (and password) in pdf.js's worker so typing in options stays smooth. */
