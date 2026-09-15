@@ -1,0 +1,276 @@
+/* TouchPDF — the document is the hero. Pages sit like paper on a quiet desk;
+   the interface stays out of the way. System fonts keep first paint instant. */
+
+:root {
+  color-scheme: light;
+  --desk: #eceef1;
+  --paper: #ffffff;
+  --ink: #15171c;
+  --graphite: #5b6170;
+  --rule: #d4d8df;
+  --rule-strong: #b6bcc6;
+  --signal: #f15a22;
+  --signal-press: #d9480f;
+  --on-signal: #15171c;
+  --danger: #b42318;
+  --success: #1c7c3c;
+  --shadow-sheet: 0 1px 2px rgb(21 23 28 / 0.08), 0 8px 24px rgb(21 23 28 / 0.06);
+  --radius: 10px;
+  --radius-sheet: 3px;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --wrap: 1080px;
+  --gutter: clamp(16px, 4vw, 32px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --desk: #111317;
+    --paper: #1a1d23;
+    --ink: #eceef1;
+    --graphite: #9aa1ae;
+    --rule: #2a2e36;
+    --rule-strong: #3d424d;
+    --signal: #ff6b35;
+    --signal-press: #ff8a5c;
+    --on-signal: #111317;
+    --danger: #ff7b72;
+    --success: #56d364;
+    --shadow-sheet: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.35);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--desk);
+  color: var(--ink);
+  font: 16px/1.55 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.wrap {
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.muted {
+  color: var(--graphite);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Header and footer */
+
+.site-header {
+  border-bottom: 1px solid var(--rule);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brand b {
+  color: var(--signal);
+  font-weight: inherit;
+}
+
+.header-nav a {
+  color: var(--graphite);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.header-nav a:hover {
+  color: var(--ink);
+}
+
+.site-footer {
+  border-top: 1px solid var(--rule);
+  padding-block: 24px;
+  color: var(--graphite);
+  font-size: 14px;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+/* Home */
+
+.intro {
+  max-width: 760px;
+  padding-block: clamp(40px, 8vw, 88px) clamp(28px, 5vw, 48px);
+}
+
+.intro h1 {
+  font-size: clamp(34px, 5.5vw, 52px);
+  font-weight: 700;
+}
+
+.lede {
+  max-width: 60ch;
+  margin-top: 16px;
+  color: var(--graphite);
+  font-size: clamp(17px, 2vw, 19px);
+}
+
+.index {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 40px 32px;
+  padding-bottom: 80px;
+}
+
+.index-group h2 {
+  margin-bottom: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--graphite);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.index-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.index-group a {
+  display: block;
+  padding-block: 9px;
+  text-decoration: none;
+}
+
+.tool-name {
+  display: block;
+  font-weight: 600;
+}
+
+.tool-summary {
+  display: block;
+  color: var(--graphite);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.index-group a:hover .tool-name {
+  text-decoration: underline 2px var(--signal);
+  text-underline-offset: 3px;
+}
+
+/* Long-form pages */
+
+.prose {
+  max-width: 68ch;
+  padding-block: 48px 80px;
+}
+
+.prose h1 {
+  margin-bottom: 8px;
+  font-size: clamp(30px, 4vw, 38px);
+}
+
+.prose h2 {
+  margin: 32px 0 8px;
+  font-size: 20px;
+}
+
+.prose p + p,
+.prose ul {
+  margin-top: 12px;
+}
+
+.prose li + li {
+  margin-top: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
