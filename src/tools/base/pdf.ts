@@ -44,6 +44,29 @@ export async function openPdfView(toolFile: ToolFile): Promise<PDFDocumentProxy>
   }
 }
 
+const pageCounts = new WeakMap<File, Map<string, Promise<number>>>();
+
+/** Page count, read once per file (and password) in pdf.js's worker so typing in options stays smooth. */
+export function countPages(toolFile: ToolFile): Promise<number> {
+  let byPassword = pageCounts.get(toolFile.file);
+  if (!byPassword) {
+    byPassword = new Map();
+    pageCounts.set(toolFile.file, byPassword);
+  }
+  const key = toolFile.password ?? "";
+  let count = byPassword.get(key);
+  if (!count) {
+    count = openPdfView(toolFile).then(async (pdf) => {
+      const pages = pdf.numPages;
+      await pdf.loadingTask.destroy();
+      return pages;
+    });
+    count.catch(() => byPassword.delete(key));
+    byPassword.set(key, count);
+  }
+  return count;
+}
+
 /**
  * Removes what's left of the security handler after a PDF was opened with its password,
  * so the saved copy opens without one.

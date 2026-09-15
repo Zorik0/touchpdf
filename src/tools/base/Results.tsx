@@ -39,7 +39,12 @@ export function Results({ outputs, zipName, onBack, onStartOver }: ResultsProps)
             <span className="file-name">{output.name}</span>
             <span className="file-details">{formatBytes(output.blob.size)}</span>
             {!single && (
-              <button type="button" className="link-button" onClick={() => downloadBlob(output.blob, output.name)}>
+              <button
+                type="button"
+                className="link-button"
+                aria-label={`Download ${output.name}`}
+                onClick={() => downloadBlob(output.blob, output.name)}
+              >
                 Download
               </button>
             )}
