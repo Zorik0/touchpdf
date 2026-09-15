@@ -8,4 +8,5 @@ export const TOOL_LOADERS: Record<string, ToolLoader> = {
   "split-pdf": () => import("./split-pdf/tool"),
   "compress-pdf": () => import("./compress-pdf/tool"),
   "pdf-to-png": () => import("./pdf-to-png/tool"),
+  "png-to-pdf": () => import("./png-to-pdf/tool"),
 };
