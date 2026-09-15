@@ -112,6 +112,20 @@ export const TOOLS: ToolMeta[] = [
         "Encrypt a PDF with a password using AES-256, and optionally block printing or copying. Done in your browser, nothing is uploaded.",
     },
   },
+  {
+    slug: "unlock-pdf",
+    name: "Unlock PDF",
+    summary: "Remove a password you know",
+    description: "Remove the password and restrictions from a PDF you're allowed to open.",
+    category: "protect",
+    input: { accept: "pdf", multiple: false },
+    zipName: "unlocked.zip",
+    seo: {
+      title: "Unlock PDF and remove its password for free",
+      description:
+        "Remove the password or printing and copying restrictions from your PDF, with the password you know. Nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
