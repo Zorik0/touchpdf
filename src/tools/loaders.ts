@@ -13,4 +13,5 @@ export const TOOL_LOADERS: Record<string, ToolLoader> = {
   "unlock-pdf": () => import("./unlock-pdf/tool"),
   "watermark-pdf": () => import("./watermark-pdf/tool"),
   "page-numbers": () => import("./page-numbers/tool"),
+  "extract-text": () => import("./extract-text/tool"),
 };
