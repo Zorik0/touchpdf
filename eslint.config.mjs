@@ -2,22 +2,8 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
-const eslintConfig = defineConfig([
+export default defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    // Generated/vendored assets (PWA service worker, pdf.js worker):
-    "public/sw.js",
-    "public/swe-worker-*.js",
-    "public/workbox-*.js",
-    "public/pdf.worker.min.mjs",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "public/**", "backend/**"]),
 ]);
-
-export default eslintConfig;
