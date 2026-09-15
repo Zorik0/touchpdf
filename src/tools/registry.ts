@@ -84,6 +84,20 @@ export const TOOLS: ToolMeta[] = [
         "Convert PDF pages to high-quality JPG or PNG images in your browser. Pick the pages and resolution. Nothing is uploaded.",
     },
   },
+  {
+    slug: "png-to-pdf",
+    name: "JPG to PDF",
+    summary: "Turn photos and images into a PDF",
+    description: "Turn JPG, PNG or WebP images into one PDF, one image per page.",
+    category: "convert",
+    input: { accept: "image", multiple: true },
+    zipName: "images.zip",
+    seo: {
+      title: "JPG to PDF: convert images to PDF for free",
+      description:
+        "Combine JPG, PNG and WebP images into a single PDF in the order you choose. Phone photos stay the right way up. Nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
