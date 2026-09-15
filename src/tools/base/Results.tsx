@@ -5,7 +5,13 @@ import { loadZip } from "./engines";
 import { downloadBlob, formatBytes } from "./files";
 import type { ToolOutput } from "./types";
 
-type ResultsProps = { outputs: ToolOutput[]; zipName: string; onBack: () => void; onStartOver: () => void };
+type ResultsProps = {
+  outputs: ToolOutput[];
+  zipName: string;
+  /** Returns to the options. Omitted for tools without any. */
+  onBack?: () => void;
+  onStartOver: () => void;
+};
 
 export function Results({ outputs, zipName, onBack, onStartOver }: ResultsProps) {
   const [zipping, setZipping] = useState(false);
@@ -52,9 +58,11 @@ export function Results({ outputs, zipName, onBack, onStartOver }: ResultsProps)
       )}
 
       <div className="panel-links">
-        <button type="button" className="link-button" onClick={onBack}>
-          Change options
-        </button>
+        {onBack && (
+          <button type="button" className="link-button" onClick={onBack}>
+            Change options
+          </button>
+        )}
         <button type="button" className="link-button" onClick={onStartOver}>
           Start over with new files
         </button>
