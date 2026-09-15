@@ -98,6 +98,20 @@ export const TOOLS: ToolMeta[] = [
         "Combine JPG, PNG and WebP images into a single PDF in the order you choose. Phone photos stay the right way up. Nothing is uploaded.",
     },
   },
+  {
+    slug: "protect-pdf",
+    name: "Protect PDF",
+    summary: "Add a password to a PDF",
+    description: "Lock a PDF with a password, using AES-256 encryption.",
+    category: "protect",
+    input: { accept: "pdf", multiple: false },
+    zipName: "protected.zip",
+    seo: {
+      title: "Password protect a PDF for free",
+      description:
+        "Encrypt a PDF with a password using AES-256, and optionally block printing or copying. Done in your browser, nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
