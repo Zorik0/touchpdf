@@ -76,6 +76,7 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
   }, []);
 
   function moveFile(id: string, offset: -1 | 1) {
+    setPhase({ name: "ready" });
     setFiles((current) => {
       const index = current.findIndex((file) => file.id === id);
       const target = index + offset;
@@ -92,6 +93,7 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
   }
 
   function setPassword(id: string, password: string) {
+    setPhase({ name: "ready" });
     setFiles((current) => current.map((file) => (file.id === id ? { ...file, password } : file)));
   }
 
@@ -172,7 +174,7 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
           <Results
             outputs={phase.outputs}
             zipName={zipName}
-            onBack={() => setPhase({ name: "ready" })}
+            onBack={OptionsForm ? () => setPhase({ name: "ready" }) : undefined}
             onStartOver={startOver}
           />
         ) : (
