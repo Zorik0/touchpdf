@@ -1,41 +1,57 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of use",
+  description: "The terms for using TouchPDF.",
+  alternates: { canonical: "/terms" },
+};
+
 export default function TermsPage() {
   return (
-    <div className="page-container">
-      <div style={{ maxWidth: 720, margin: '0 auto', paddingTop: 40 }}>
-        <h1 className="section-title" style={{ fontSize: '2rem', marginBottom: 24 }}>Terms of Use</h1>
-        <div style={{ color: 'var(--text-secondary)', lineHeight: 1.8, fontSize: '0.92rem' }}>
-          <p style={{ marginBottom: 16 }}><strong>Last updated:</strong> February 19, 2026</p>
+    <article className="wrap prose">
+      <h1>Terms of use</h1>
+      <p className="muted">Last updated September 15, 2026</p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>1. Acceptance</h2>
-          <p style={{ marginBottom: 16 }}>By using TouchPDF (&quot;touchpdf.space&quot;), you agree to these Terms. If you do not agree, do not use the service.</p>
+      <h2>Using TouchPDF</h2>
+      <p>
+        By using touchpdf.space you agree to these terms. If you don&apos;t agree, please don&apos;t use the site.
+      </p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>2. Service Description</h2>
-          <p style={{ marginBottom: 16 }}>TouchPDF provides free, client-side PDF tools. All processing happens in your browser. We do not guarantee results for every PDF format or corrupt files.</p>
+      <h2>The service</h2>
+      <p>
+        TouchPDF provides free PDF tools that run in your browser. Some files, such as damaged or unusual PDFs, may
+        not work, and we can&apos;t guarantee a result for every document.
+      </p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>3. No Warranty</h2>
-          <p style={{ marginBottom: 16 }}>The service is provided &quot;as is&quot; without warranties of any kind. We are not responsible for any data loss, corruption, or issues arising from the use of this tool.</p>
+      <h2>No warranty</h2>
+      <p>
+        The service is provided as is, without warranties of any kind. Keep a copy of important files before you
+        change them.
+      </p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>4. Acceptable Use</h2>
-          <p style={{ marginBottom: 16 }}>You agree not to:</p>
-          <ul style={{ paddingLeft: 24, marginBottom: 16 }}>
-            <li>Use the service for illegal purposes</li>
-            <li>Attempt to reverse-engineer or scrape the site</li>
-            <li>Overload the service with automated requests</li>
-          </ul>
+      <h2>Acceptable use</h2>
+      <ul>
+        <li>Don&apos;t use TouchPDF for anything illegal.</li>
+        <li>Only unlock or edit documents you have the right to change.</li>
+        <li>Don&apos;t overload the site with automated requests.</li>
+      </ul>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>5. Intellectual Property</h2>
-          <p style={{ marginBottom: 16 }}>TouchPDF and its logo are owned by the creator. You retain all rights to your own files. We never access, copy, or store your documents.</p>
+      <h2>Your content</h2>
+      <p>You keep all rights to your files. We never receive, copy or store them.</p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>6. Limitation of Liability</h2>
-          <p style={{ marginBottom: 16 }}>TouchPDF shall not be liable for any indirect, incidental, or consequential damages resulting from the use of the service.</p>
+      <h2>Liability</h2>
+      <p>
+        TouchPDF isn&apos;t liable for indirect, incidental or consequential damages that result from using the
+        service.
+      </p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>7. Changes</h2>
-          <p style={{ marginBottom: 16 }}>We may update these terms at any time. Continued use of the service constitutes acceptance of updated terms.</p>
+      <h2>Changes</h2>
+      <p>We may update these terms. Using the site after a change means you accept the updated terms.</p>
 
-          <h2 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', margin: '28px 0 12px', fontWeight: 700 }}>8. Contact</h2>
-          <p style={{ marginBottom: 16 }}>For questions, contact: <strong>legal@touchpdf.space</strong></p>
-        </div>
-      </div>
-    </div>
+      <h2>Contact</h2>
+      <p>
+        Questions about these terms: <a href="mailto:legal@touchpdf.space">legal@touchpdf.space</a>
+      </p>
+    </article>
   );
 }
