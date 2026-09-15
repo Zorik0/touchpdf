@@ -38,6 +38,7 @@ export function Results({ outputs, zipName, onBack, onStartOver }: ResultsProps)
           <li key={output.name} className="output-row">
             <span className="file-name">{output.name}</span>
             <span className="file-details">{formatBytes(output.blob.size)}</span>
+            {output.note && <span className="output-note">{output.note}</span>}
             {!single && (
               <button
                 type="button"

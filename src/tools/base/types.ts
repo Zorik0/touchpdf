@@ -1,7 +1,12 @@
 import type { ComponentType } from "react";
 import type { ToolFile } from "./files";
 
-export type ToolOutput = { name: string; blob: Blob };
+export type ToolOutput = {
+  name: string;
+  blob: Blob;
+  /** A short line about the result, e.g. "62% smaller". */
+  note?: string;
+};
 
 export type RunContext = {
   /** Report progress, e.g. progress(3, 12) while on page 3 of 12. */
