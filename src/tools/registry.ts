@@ -140,6 +140,20 @@ export const TOOLS: ToolMeta[] = [
         "Stamp CONFIDENTIAL, DRAFT or your own text across PDF pages, with size, opacity and color controls. Nothing is uploaded.",
     },
   },
+  {
+    slug: "page-numbers",
+    name: "Page numbers",
+    summary: "Number the pages of a PDF",
+    description: "Add page numbers to a PDF, in the position and style you want.",
+    category: "edit",
+    input: { accept: "pdf", multiple: false },
+    zipName: "numbered.zip",
+    seo: {
+      title: "Add page numbers to PDF for free",
+      description:
+        "Number PDF pages at the top or bottom, with styles like Page 1 of 9, and skip a cover page. Free and private.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
