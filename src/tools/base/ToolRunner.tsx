@@ -78,6 +78,12 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
     setStatuses((current) => ({ ...current, [id]: status }));
   }, []);
 
+  // Stable, so workspaces can safely call it from their own effects.
+  const editInWorkspace = useCallback((next: unknown) => {
+    setPhase({ name: "ready" });
+    setOptions(next);
+  }, []);
+
   function moveFile(id: string, offset: -1 | 1) {
     setPhase({ name: "ready" });
     setFiles((current) => {
@@ -155,9 +161,11 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
   }
 
   const OptionsForm = definition?.Options;
+  const Workspace = definition?.Workspace;
+  const workspaceReady = Workspace && files.every((file) => (statuses[file.id] ?? initialStatus(file)).state === "ready");
 
   return (
-    <div className="runner workbench">
+    <div className={`runner workbench${Workspace ? " has-workspace" : ""}`}>
       <div className="stage">
         <FileList
           files={files}
@@ -170,6 +178,9 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
           onPassword={setPassword}
         />
         {input.multiple && phase.name === "ready" && <Dropzone {...input} compact onFiles={addFiles} />}
+        {workspaceReady && (
+          <Workspace files={files} options={options} setOptions={editInWorkspace} disabled={working} />
+        )}
       </div>
 
       <aside className="panel" aria-label="Options">
