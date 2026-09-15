@@ -60,9 +60,12 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
   useEffect(() => {
     if (!definition?.validate || files.length === 0) return;
     let current = true;
-    Promise.resolve(definition.validate(files, options)).then((message) => {
-      if (current) setChecked({ files, options, message });
-    });
+    Promise.resolve(definition.validate(files, options))
+      // A locked or unreadable file is already reported in the file list.
+      .catch(() => null)
+      .then((message) => {
+        if (current) setChecked({ files, options, message });
+      });
     return () => {
       current = false;
     };
@@ -188,7 +191,7 @@ export function ToolRunner({ input, definition, zipName }: ToolRunnerProps) {
             {!enoughFiles && definition?.minFiles && (
               <p className="field-hint">Add at least {definition.minFiles} files.</p>
             )}
-            {validation && <p className="field-error">{validation}</p>}
+            {validation && <p className="field-hint">{validation}</p>}
             {notice && (
               <p className="notice" role="alert">
                 {notice}
