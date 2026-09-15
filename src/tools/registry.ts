@@ -154,6 +154,20 @@ export const TOOLS: ToolMeta[] = [
         "Number PDF pages at the top or bottom, with styles like Page 1 of 9, and skip a cover page. Free and private.",
     },
   },
+  {
+    slug: "extract-text",
+    name: "PDF to text",
+    summary: "Copy all the text out of a PDF",
+    description: "Pull all the text out of a PDF into a plain text file.",
+    category: "convert",
+    input: { accept: "pdf", multiple: false },
+    zipName: "text.zip",
+    seo: {
+      title: "PDF to text: extract text from PDF for free",
+      description:
+        "Extract the text from a PDF into a .txt file, keeping lines in reading order. Runs in your browser, nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
