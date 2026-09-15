@@ -1,5 +1,8 @@
 // Every tool on the site, as data. The home index, tool pages, sitemap and
 // metadata all read from this list, so a tool exists in exactly one place.
+// What a tool does lives in src/tools/<slug>/tool.ts, loaded via loaders.ts.
+
+import type { ToolInput } from "./base/files";
 
 export type CategoryId = "organize" | "convert" | "edit" | "protect";
 
@@ -18,6 +21,9 @@ export type ToolMeta = {
   /** The sentence under the tool's heading. */
   description: string;
   category: CategoryId;
+  input: ToolInput;
+  /** File name used when several results download together. */
+  zipName: string;
   seo: { title: string; description: string };
 };
 
