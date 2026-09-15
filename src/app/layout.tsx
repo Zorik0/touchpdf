@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { ADSENSE_CLIENT, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s | TouchPDF",
   },
   description:
-    "Merge, split, compress, sign and convert PDFs for free. No sign-up, no watermarks, and your files never leave your device.",
+    "Merge, split, compress and convert PDFs for free. No sign-up, no watermarks, and your files never leave your device.",
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   openGraph: { type: "website", siteName: SITE_NAME, url: SITE_URL },
@@ -34,6 +35,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter />
+        {/* Ads load once the browser is idle, so they never slow down a tool. */}
+        {ADSENSE_CLIENT && (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            strategy="lazyOnload"
+            crossOrigin="anonymous"
+          />
+        )}
       </body>
     </html>
   );

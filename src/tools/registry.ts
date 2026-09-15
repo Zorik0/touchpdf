@@ -9,7 +9,7 @@ export type CategoryId = "organize" | "convert" | "edit" | "protect";
 export const CATEGORIES: { id: CategoryId; name: string }[] = [
   { id: "organize", name: "Organize" },
   { id: "convert", name: "Convert" },
-  { id: "edit", name: "Edit and sign" },
+  { id: "edit", name: "Edit" },
   { id: "protect", name: "Protect" },
 ];
 
