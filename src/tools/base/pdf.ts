@@ -13,14 +13,19 @@ export class PasswordError extends Error {
   }
 }
 
-/** Opens a PDF for editing. Files with only permission restrictions open without asking. */
+/**
+ * Opens a PDF for editing. Files with only permission restrictions open without asking.
+ * Encrypted files come back fully decrypted, so saving them never produces a broken copy.
+ */
 export async function openPdf(toolFile: ToolFile): Promise<PDFDocument> {
   const { PDFDocument, EncryptedPDFError } = await loadPdfLib();
   try {
-    return await PDFDocument.load(await readBytes(toolFile.file), {
+    const doc = await PDFDocument.load(await readBytes(toolFile.file), {
       password: toolFile.password ?? "",
       updateMetadata: false,
     });
+    if (doc.context.isDecrypted) await stripEncryption(doc);
+    return doc;
   } catch (error) {
     if (error instanceof EncryptedPDFError) throw new PasswordError(toolFile.id, false);
     if (error instanceof Error && /password incorrect/i.test(error.message)) {
@@ -71,7 +76,7 @@ export function countPages(toolFile: ToolFile): Promise<number> {
  * Removes what's left of the security handler after a PDF was opened with its password,
  * so the saved copy opens without one.
  */
-export async function stripEncryption(doc: PDFDocument): Promise<void> {
+async function stripEncryption(doc: PDFDocument): Promise<void> {
   const { PDFDict, PDFName, PDFRawStream } = await loadPdfLib();
   for (const [ref, object] of doc.context.enumerateIndirectObjects()) {
     const dict = object instanceof PDFDict ? object : object instanceof PDFRawStream ? object.dict : undefined;
