@@ -12,4 +12,5 @@ export const TOOL_LOADERS: Record<string, ToolLoader> = {
   "protect-pdf": () => import("./protect-pdf/tool"),
   "unlock-pdf": () => import("./unlock-pdf/tool"),
   "watermark-pdf": () => import("./watermark-pdf/tool"),
+  "page-numbers": () => import("./page-numbers/tool"),
 };
