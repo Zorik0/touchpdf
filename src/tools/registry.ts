@@ -73,15 +73,15 @@ export const TOOLS: ToolMeta[] = [
   {
     slug: "compress-pdf",
     name: "Compress PDF",
-    summary: "Make a PDF smaller",
-    description: "Make a PDF smaller by shrinking the images inside it. Text stays sharp.",
+    summary: "Shrink a PDF to the size you need",
+    description: "Shrink a PDF to the size you need, down to 100 KB. Pick a target and it gets as close as it can.",
     category: "organize",
     input: { accept: "pdf", multiple: false },
     zipName: "compressed.zip",
     seo: {
-      title: "Compress PDF to reduce file size for free",
+      title: "Compress PDF to 100 KB, 200 KB or any size, free",
       description:
-        "Shrink PDF files for email and uploads by compressing their images, right in your browser. Free, and nothing is uploaded.",
+        "Reduce a PDF to 500 KB, 200 KB or even 100 KB for forms and email. Choose the target size, and it all runs in your browser.",
     },
   },
   {
