@@ -70,6 +70,20 @@ export const TOOLS: ToolMeta[] = [
         "Shrink PDF files for email and uploads by compressing their images, right in your browser. Free, and nothing is uploaded.",
     },
   },
+  {
+    slug: "pdf-to-png",
+    name: "PDF to JPG",
+    summary: "Save pages as JPG or PNG images",
+    description: "Save PDF pages as JPG or PNG images, at screen or print resolution.",
+    category: "convert",
+    input: { accept: "pdf", multiple: false },
+    zipName: "pages.zip",
+    seo: {
+      title: "PDF to JPG and PNG converter, free",
+      description:
+        "Convert PDF pages to high-quality JPG or PNG images in your browser. Pick the pages and resolution. Nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
