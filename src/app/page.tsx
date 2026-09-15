@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <div className="wrap">
       <section className="intro">
-        <h1>Merge, split, sign and convert PDFs in your browser.</h1>
+        <h1>Merge, split, compress and convert PDFs in your browser.</h1>
         <p className="lede">
           Free, with no sign-up and no watermarks. Every tool runs on your device, so your files are never uploaded.
         </p>
