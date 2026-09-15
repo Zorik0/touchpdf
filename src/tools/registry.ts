@@ -56,6 +56,20 @@ export const TOOLS: ToolMeta[] = [
         "Extract pages from a PDF or split it by ranges, every page or every few pages. Free, private, and nothing is uploaded.",
     },
   },
+  {
+    slug: "compress-pdf",
+    name: "Compress PDF",
+    summary: "Make a PDF smaller",
+    description: "Make a PDF smaller by shrinking the images inside it. Text stays sharp.",
+    category: "organize",
+    input: { accept: "pdf", multiple: false },
+    zipName: "compressed.zip",
+    seo: {
+      title: "Compress PDF to reduce file size for free",
+      description:
+        "Shrink PDF files for email and uploads by compressing their images, right in your browser. Free, and nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
