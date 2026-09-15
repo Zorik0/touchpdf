@@ -14,4 +14,5 @@ export const TOOL_LOADERS: Record<string, ToolLoader> = {
   "watermark-pdf": () => import("./watermark-pdf/tool"),
   "page-numbers": () => import("./page-numbers/tool"),
   "extract-text": () => import("./extract-text/tool"),
+  "privacy-clean": () => import("./privacy-clean/tool"),
 };
