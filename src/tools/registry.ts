@@ -168,6 +168,20 @@ export const TOOLS: ToolMeta[] = [
         "Extract the text from a PDF into a .txt file, keeping lines in reading order. Runs in your browser, nothing is uploaded.",
     },
   },
+  {
+    slug: "privacy-clean",
+    name: "PDF metadata",
+    summary: "Remove or edit hidden details",
+    description: "Remove the hidden author, app and date details from a PDF, or edit them.",
+    category: "protect",
+    input: { accept: "pdf", multiple: false },
+    zipName: "clean.zip",
+    seo: {
+      title: "Remove or edit PDF metadata for free",
+      description:
+        "Strip the author, creator app, dates and XMP metadata from a PDF, or edit its title and author. Nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
