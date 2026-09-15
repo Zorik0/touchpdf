@@ -126,6 +126,20 @@ export const TOOLS: ToolMeta[] = [
         "Remove the password or printing and copying restrictions from your PDF, with the password you know. Nothing is uploaded.",
     },
   },
+  {
+    slug: "watermark-pdf",
+    name: "Watermark PDF",
+    summary: "Stamp text across every page",
+    description: "Stamp text such as CONFIDENTIAL or DRAFT across every page.",
+    category: "edit",
+    input: { accept: "pdf", multiple: false },
+    zipName: "watermarked.zip",
+    seo: {
+      title: "Add a watermark to PDF for free",
+      description:
+        "Stamp CONFIDENTIAL, DRAFT or your own text across PDF pages, with size, opacity and color controls. Nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
