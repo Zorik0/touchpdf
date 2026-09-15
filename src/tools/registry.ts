@@ -42,6 +42,20 @@ export const TOOLS: ToolMeta[] = [
         "Combine PDF files into one document in the order you choose. Free, no sign-up, and your files never leave your device.",
     },
   },
+  {
+    slug: "split-pdf",
+    name: "Split PDF",
+    summary: "Pull out pages or split into files",
+    description: "Pull out the pages you need, or split a PDF into several smaller files.",
+    category: "organize",
+    input: { accept: "pdf", multiple: false },
+    zipName: "split-pages.zip",
+    seo: {
+      title: "Split PDF and extract pages for free",
+      description:
+        "Extract pages from a PDF or split it by ranges, every page or every few pages. Free, private, and nothing is uploaded.",
+    },
+  },
 ];
 
 export function findTool(slug: string): ToolMeta | undefined {
