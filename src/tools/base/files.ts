@@ -64,7 +64,7 @@ export function formatBytes(bytes: number): string {
     value /= 1024;
     unit += 1;
   }
-  return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unit]}`;
+  return `${value.toFixed(value < 10 ? 1 : 0).replace(/\.0$/, "")} ${units[unit]}`;
 }
 
 export function baseName(name: string): string {
