@@ -57,6 +57,20 @@ export const TOOLS: ToolMeta[] = [
     },
   },
   {
+    slug: "organize",
+    name: "Organize pages",
+    summary: "Reorder, rotate, delete and add pages",
+    description: "Reorder, rotate and delete pages, or add blank ones, then save a new PDF.",
+    category: "organize",
+    input: { accept: "pdf", multiple: false },
+    zipName: "organized.zip",
+    seo: {
+      title: "Organize PDF pages: reorder, rotate and delete for free",
+      description:
+        "Drag PDF pages into a new order, rotate or delete them, add blank pages and save. Free, and your file never leaves your device.",
+    },
+  },
+  {
     slug: "compress-pdf",
     name: "Compress PDF",
     summary: "Make a PDF smaller",
