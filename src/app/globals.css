@@ -663,6 +663,12 @@ a {
   font-size: 15px;
 }
 
+.output-note {
+  grid-column: 1 / -1;
+  color: var(--graphite);
+  font-size: 14px;
+}
+
 .output-row .link-button {
   grid-column: 1 / -1;
   justify-self: start;
