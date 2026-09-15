@@ -20,6 +20,11 @@ export type OptionsProps<Options> = {
   setOptions: (next: Options) => void;
 };
 
+export type WorkspaceProps<Options> = OptionsProps<Options> & {
+  /** True while the tool runs, so edits can't change what's being processed. */
+  disabled: boolean;
+};
+
 /**
  * The base module's contract. A tool only describes its options and what it
  * does to the files; picking files, passwords, progress, errors and downloads
@@ -30,6 +35,11 @@ export type ToolDefinition<Options> = {
   /** Fewest files the tool needs. Defaults to 1. */
   minFiles?: number;
   Options?: ComponentType<OptionsProps<Options>>;
+  /**
+   * An interactive area shown instead of the file list once the file is readable,
+   * for tools where you work on the pages themselves (organize, sign, redact…).
+   */
+  Workspace?: ComponentType<WorkspaceProps<Options>>;
   /** Names the main button after what it does, e.g. "Merge 3 PDFs". */
   actionLabel: (files: ToolFile[], options: Options) => string;
   /** Explains what's missing before the tool can run, or returns null. */
